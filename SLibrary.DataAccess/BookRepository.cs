@@ -10,16 +10,15 @@ namespace SLibrary.DataAccess
 {
     public interface IBookRepository
     {
-        void SaveBooksToFile();
+        void SaveBooksToFile(List<Book> books);
 
         List<Book> LoadBooksFromFile();
     }
     public class BookRepository : IBookRepository
     {
-        static List<Book> books = new List<Book>();
         static string filePath = "BooksData.csv";
 
-        public void SaveBooksToFile()
+        public void SaveBooksToFile(List<Book> books)
         {
 
             List<string> lines = new List<string>();
@@ -34,6 +33,8 @@ namespace SLibrary.DataAccess
 
         public List<Book> LoadBooksFromFile()
         {
+            var books = new List<Book>();
+
             if (File.Exists(filePath))
             {
                 string[] lines = File.ReadAllLines(filePath);

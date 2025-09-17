@@ -46,7 +46,7 @@ namespace SLibrary.Business
                 }
                 books.Add(b);
             }
-            repo.SaveBooksToFile();
+            repo.SaveBooksToFile(books);
 
         }
 
@@ -66,7 +66,7 @@ namespace SLibrary.Business
                         Console.WriteLine("Book Can Not be Resered\n");
                 }
             }
-            repo.SaveBooksToFile();
+            repo.SaveBooksToFile(books);
         }
 
         public override string ToString()
@@ -99,7 +99,7 @@ namespace SLibrary.Business
                         Console.WriteLine("There is NO Book to Release\n");
                 }
             }
-            repo.SaveBooksToFile();
+            repo.SaveBooksToFile(books);
         }
     }
 }
