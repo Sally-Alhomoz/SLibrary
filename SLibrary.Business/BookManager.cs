@@ -50,7 +50,7 @@ namespace SLibrary.Business
 
         }
 
-        public void ReserveBook(string title)
+        public string ReserveBook(string title)
         {
             foreach (Book b in books)
             {
@@ -60,13 +60,14 @@ namespace SLibrary.Business
                     {
                         b.ReservedCount++;
                         b.AvailableCount--;
-                        Console.WriteLine("Book Reserved Successfully !!\n");
+                        repo.SaveBooksToFile(books);
+                        return "Book Reserved Successfully !!";
                     }
                     else
-                        Console.WriteLine("Book Can Not be Resered\n");
+                        return "Book Can Not be Reserved ";
                 }
             }
-            repo.SaveBooksToFile(books);
+            return "Book Not Found";
         }
 
         public override string ToString()
@@ -83,7 +84,7 @@ namespace SLibrary.Business
 
         }
 
-        public void ReleaseBook(string title)
+        public string ReleaseBook(string title)
         {
             foreach (Book b in books)
             {
@@ -93,13 +94,14 @@ namespace SLibrary.Business
                     {
                         b.ReservedCount--;
                         b.AvailableCount++;
-                        Console.WriteLine("Book Released Successfully !!\n");
+                        repo.SaveBooksToFile(books);
+                        return "Book Released Successfully !!";
                     }
                     else
-                        Console.WriteLine("There is NO Book to Release\n");
+                        return "There is NO Book to Release";
                 }
             }
-            repo.SaveBooksToFile(books);
+            return "Book Not found";
         }
     }
 }

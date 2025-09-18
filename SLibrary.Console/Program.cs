@@ -43,7 +43,8 @@ namespace SLibraryConsole
 
                             Console.WriteLine("Enter a Book Title to Reseve : ");
                             string title = Console.ReadLine();
-                            bookMng.ReserveBook(title);
+                            string msg =bookMng.ReserveBook(title);
+                            Console.WriteLine(msg);
                         }
                         break;
 
@@ -51,7 +52,8 @@ namespace SLibraryConsole
                         {
                             Console.WriteLine("Enter a Book Title to Release : ");
                             string title = Console.ReadLine();
-                            bookMng.ReleaseBook(title);
+                            string msg = bookMng.ReleaseBook(title);
+                            Console.WriteLine(msg);
                         }
                         break;
 
