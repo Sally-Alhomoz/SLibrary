@@ -20,6 +20,10 @@ namespace SLibraryUI
         public UI()
         {
             InitializeComponent();
+            SetupDataGrid();
+            FillBookGrid();
+            FillReserveGrid();
+
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -32,61 +36,95 @@ namespace SLibraryUI
 
         }
 
-        private void button1_Click(object sender, EventArgs e)
+        private void SetupDataGrid()
         {
-            int choice = Convert.ToInt32(textBox1.Text);
+            BookDGV.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            BookDGV.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
+            ReserveDGV.ColumnHeadersDefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter;
+            ReserveDGV.ColumnHeadersDefaultCellStyle.Font = new Font("Segoe UI", 10, FontStyle.Bold);
 
-            switch(choice)
+        }
+
+
+
+        private void FillBookGrid()
+        {
+            BookDGV.Rows.Clear();
+            foreach(Book b in bookMng.GetAllBooks())
             {
-                case 1:
-                    {
-                        AddBook();
-                    }break;
-
-                case 2:
-                    {
-                        ReserveBook();
-                    }
-                    break;
-
-                case 3:
-                    {
-                        ReleaseBook();
-                    }
-                    break;
-
-                case 4:
-                    {
-                        MessageBox.Show(bookMng.ToString(), "List of Books");
-                    }
-                    break;
+                BookDGV.Rows.Add(b.ID, b.Title,b.Author, b.AvailableCount,b.ReservedCount);
             }
-           
         }
 
-        private void AddBook()
+        private void FillReserveGrid()
         {
-            string title = Interaction.InputBox("Enter the book title ", "Add Book");
-
-            Book b = new Book(title, 0, 1, 0);
-            bookMng.Add(b);
-            MessageBox.Show($"Book {title} added !");
+            ReserveDGV.Rows.Clear();
+            foreach (Reservation r in bookMng.GetAllReservations())
+            {
+                ReserveDGV.Rows.Add(r.ClientID, r.ClientName, r.BookID, r.BookTitle, r.ReservedDate, r.ReleaseDate?.ToString() ?? "-");
+            }
         }
 
-        private void ReserveBook()
+        private void dataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
-            string title = Interaction.InputBox("Enter book title to Reserve ", "Reserve Book");
 
-            string msg = bookMng.ReserveBook(title);
-            MessageBox.Show(msg);
         }
 
-        private void ReleaseBook()
+        private void addBook_Click(object sender, EventArgs e)
         {
-            string title = Interaction.InputBox("Enter book title to Release ", "Release Book");
+            using (AddBook form = new AddBook())
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    int newId = bookMng.GetAllBooks().Count + 1;
+                    Book newBook = new Book(newId, form.BookTitle, form.BookAuthor, 1, 0);
+                    bookMng.Add(newBook);
+                    FillBookGrid();
+                }
+                else
+                { }
+            }
+        }
 
-            string msg=  bookMng.ReleaseBook(title);
-            MessageBox.Show(msg);
+        private void Reserve_Click(object sender, EventArgs e)
+        {
+            using (Actions form = new Actions("Reserve"))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string result = bookMng.ReserveBook(form.bookTitle , form.clientName);
+                    MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
+                     ? MessageBoxIcon.Information
+                    : MessageBoxIcon.Warning);
+                    FillBookGrid();
+                    FillReserveGrid();
+                }
+                else
+                { }
+            }
+        }
+
+        private void Release_Click(object sender, EventArgs e)
+        {
+            using (Actions form = new Actions("Release"))
+            {
+                if (form.ShowDialog() == DialogResult.OK)
+                {
+                    string result = bookMng.ReleaseBook(form.bookTitle, form.clientName);
+                    MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
+                     ? MessageBoxIcon.Information
+                    : MessageBoxIcon.Warning);
+                    FillBookGrid();
+                    FillReserveGrid();
+                }
+                else
+                { }
+            }
+        }
+
+        private void ReserveDGV_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+
         }
     }
 }

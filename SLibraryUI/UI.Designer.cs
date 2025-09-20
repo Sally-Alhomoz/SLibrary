@@ -28,113 +28,277 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.label1 = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.button1 = new System.Windows.Forms.Button();
-            this.label5 = new System.Windows.Forms.Label();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle1 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle2 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle3 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle4 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle5 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle6 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle10 = new System.Windows.Forms.DataGridViewCellStyle();
+            System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle11 = new System.Windows.Forms.DataGridViewCellStyle();
+            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.addBook = new System.Windows.Forms.Button();
+            this.BookDGV = new System.Windows.Forms.DataGridView();
+            this.BookID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Author = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Available = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Reserved = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Reservation = new System.Windows.Forms.TabPage();
+            this.release = new System.Windows.Forms.Button();
+            this.reserve = new System.Windows.Forms.Button();
+            this.ReserveDGV = new System.Windows.Forms.DataGridView();
+            this.ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ClientName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.book_ID = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.bookTitle = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ResDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.ReleaseDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.tabControl1.SuspendLayout();
+            this.tabPage1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.BookDGV)).BeginInit();
+            this.Reservation.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.ReserveDGV)).BeginInit();
             this.SuspendLayout();
             // 
-            // label1
+            // tabControl1
             // 
-            this.label1.AutoSize = true;
-            this.label1.Font = new System.Drawing.Font("Segoe Fluent Icons", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label1.Location = new System.Drawing.Point(50, 97);
-            this.label1.Name = "label1";
-            this.label1.Size = new System.Drawing.Size(107, 21);
-            this.label1.TabIndex = 0;
-            this.label1.Text = "1- Add Book";
-            this.label1.Click += new System.EventHandler(this.label1_Click);
+            this.tabControl1.Controls.Add(this.tabPage1);
+            this.tabControl1.Controls.Add(this.Reservation);
+            this.tabControl1.Dock = System.Windows.Forms.DockStyle.Top;
+            this.tabControl1.Location = new System.Drawing.Point(0, 0);
+            this.tabControl1.Name = "tabControl1";
+            this.tabControl1.SelectedIndex = 0;
+            this.tabControl1.Size = new System.Drawing.Size(800, 433);
+            this.tabControl1.TabIndex = 0;
             // 
-            // label2
+            // tabPage1
             // 
-            this.label2.AutoSize = true;
-            this.label2.Font = new System.Drawing.Font("Segoe Fluent Icons", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label2.Location = new System.Drawing.Point(50, 142);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(141, 21);
-            this.label2.TabIndex = 1;
-            this.label2.Text = "2- Reserve Book";
+            this.tabPage1.Controls.Add(this.addBook);
+            this.tabPage1.Controls.Add(this.BookDGV);
+            this.tabPage1.Location = new System.Drawing.Point(4, 22);
+            this.tabPage1.Name = "tabPage1";
+            this.tabPage1.Padding = new System.Windows.Forms.Padding(3);
+            this.tabPage1.Size = new System.Drawing.Size(792, 407);
+            this.tabPage1.TabIndex = 0;
+            this.tabPage1.Text = "Books";
+            this.tabPage1.UseVisualStyleBackColor = true;
             // 
-            // label3
+            // addBook
             // 
-            this.label3.AutoSize = true;
-            this.label3.Font = new System.Drawing.Font("Segoe Fluent Icons", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label3.Location = new System.Drawing.Point(50, 194);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(140, 21);
-            this.label3.TabIndex = 2;
-            this.label3.Text = "3- Release Book";
+            this.addBook.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.addBook.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.addBook.FlatAppearance.BorderColor = System.Drawing.Color.FromArgb(((int)(((byte)(128)))), ((int)(((byte)(128)))), ((int)(((byte)(255)))));
+            this.addBook.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.addBook.Location = new System.Drawing.Point(661, 30);
+            this.addBook.Name = "addBook";
+            this.addBook.Size = new System.Drawing.Size(111, 27);
+            this.addBook.TabIndex = 1;
+            this.addBook.Text = "Add Book";
+            this.addBook.UseVisualStyleBackColor = true;
+            this.addBook.Click += new System.EventHandler(this.addBook_Click);
             // 
-            // label4
+            // BookDGV
             // 
-            this.label4.AutoSize = true;
-            this.label4.Font = new System.Drawing.Font("Segoe Fluent Icons", 15.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label4.Location = new System.Drawing.Point(50, 242);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(143, 21);
-            this.label4.TabIndex = 3;
-            this.label4.Text = "4- Display Books";
+            this.BookDGV.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.BookDGV.BackgroundColor = System.Drawing.SystemColors.MenuBar;
+            this.BookDGV.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.SingleHorizontal;
+            this.BookDGV.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Single;
+            this.BookDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.BookDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.BookID,
+            this.Title,
+            this.Author,
+            this.Available,
+            this.Reserved});
+            this.BookDGV.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.BookDGV.GridColor = System.Drawing.Color.LightGray;
+            this.BookDGV.Location = new System.Drawing.Point(3, 103);
+            this.BookDGV.Name = "BookDGV";
+            this.BookDGV.Size = new System.Drawing.Size(786, 301);
+            this.BookDGV.TabIndex = 0;
             // 
-            // textBox1
+            // BookID
             // 
-            this.textBox1.Location = new System.Drawing.Point(53, 353);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(115, 20);
-            this.textBox1.TabIndex = 4;
+            dataGridViewCellStyle1.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BookID.DefaultCellStyle = dataGridViewCellStyle1;
+            this.BookID.HeaderText = "ID";
+            this.BookID.Name = "BookID";
             // 
-            // button1
+            // Title
             // 
-            this.button1.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.button1.Location = new System.Drawing.Point(235, 353);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 5;
-            this.button1.Text = "Enter";
-            this.button1.UseVisualStyleBackColor = true;
-            this.button1.Click += new System.EventHandler(this.button1_Click);
+            dataGridViewCellStyle2.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            dataGridViewCellStyle2.Font = new System.Drawing.Font("Microsoft Sans Serif", 8.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.Title.DefaultCellStyle = dataGridViewCellStyle2;
+            this.Title.HeaderText = "Title";
+            this.Title.Name = "Title";
             // 
-            // label5
+            // Author
             // 
-            this.label5.AutoSize = true;
-            this.label5.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.label5.Location = new System.Drawing.Point(49, 309);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(143, 20);
-            this.label5.TabIndex = 6;
-            this.label5.Text = "Enter Your Choice ";
+            dataGridViewCellStyle3.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Author.DefaultCellStyle = dataGridViewCellStyle3;
+            this.Author.HeaderText = "Author";
+            this.Author.Name = "Author";
+            // 
+            // Available
+            // 
+            dataGridViewCellStyle4.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Available.DefaultCellStyle = dataGridViewCellStyle4;
+            this.Available.HeaderText = "Available";
+            this.Available.Name = "Available";
+            // 
+            // Reserved
+            // 
+            dataGridViewCellStyle5.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.Reserved.DefaultCellStyle = dataGridViewCellStyle5;
+            this.Reserved.HeaderText = "Reserved";
+            this.Reserved.Name = "Reserved";
+            // 
+            // Reservation
+            // 
+            this.Reservation.Controls.Add(this.release);
+            this.Reservation.Controls.Add(this.reserve);
+            this.Reservation.Controls.Add(this.ReserveDGV);
+            this.Reservation.Location = new System.Drawing.Point(4, 22);
+            this.Reservation.Name = "Reservation";
+            this.Reservation.Padding = new System.Windows.Forms.Padding(3);
+            this.Reservation.Size = new System.Drawing.Size(792, 407);
+            this.Reservation.TabIndex = 1;
+            this.Reservation.Text = "Reservation";
+            this.Reservation.UseVisualStyleBackColor = true;
+            // 
+            // release
+            // 
+            this.release.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.release.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.release.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.release.Location = new System.Drawing.Point(669, 72);
+            this.release.Name = "release";
+            this.release.Size = new System.Drawing.Size(101, 30);
+            this.release.TabIndex = 2;
+            this.release.Text = "Release";
+            this.release.UseVisualStyleBackColor = true;
+            this.release.Click += new System.EventHandler(this.Release_Click);
+            // 
+            // reserve
+            // 
+            this.reserve.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+            this.reserve.Cursor = System.Windows.Forms.Cursors.Hand;
+            this.reserve.Font = new System.Drawing.Font("Microsoft Sans Serif", 9.75F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.reserve.Location = new System.Drawing.Point(669, 24);
+            this.reserve.Name = "reserve";
+            this.reserve.Size = new System.Drawing.Size(101, 31);
+            this.reserve.TabIndex = 1;
+            this.reserve.Text = "Reserve";
+            this.reserve.UseVisualStyleBackColor = true;
+            this.reserve.Click += new System.EventHandler(this.Reserve_Click);
+            // 
+            // ReserveDGV
+            // 
+            this.ReserveDGV.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
+            this.ReserveDGV.BackgroundColor = System.Drawing.SystemColors.MenuBar;
+            this.ReserveDGV.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.ReserveDGV.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.ID,
+            this.ClientName,
+            this.book_ID,
+            this.bookTitle,
+            this.ResDate,
+            this.ReleaseDate});
+            this.ReserveDGV.Dock = System.Windows.Forms.DockStyle.Bottom;
+            this.ReserveDGV.GridColor = System.Drawing.SystemColors.MenuBar;
+            this.ReserveDGV.Location = new System.Drawing.Point(3, 127);
+            this.ReserveDGV.Name = "ReserveDGV";
+            this.ReserveDGV.Size = new System.Drawing.Size(786, 277);
+            this.ReserveDGV.TabIndex = 0;
+            this.ReserveDGV.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ReserveDGV_CellContentClick);
+            // 
+            // ID
+            // 
+            dataGridViewCellStyle6.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ID.DefaultCellStyle = dataGridViewCellStyle6;
+            this.ID.HeaderText = "ID";
+            this.ID.Name = "ID";
+            // 
+            // ClientName
+            // 
+            dataGridViewCellStyle7.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ClientName.DefaultCellStyle = dataGridViewCellStyle7;
+            this.ClientName.HeaderText = "Client Name";
+            this.ClientName.Name = "ClientName";
+            // 
+            // book_ID
+            // 
+            dataGridViewCellStyle8.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.book_ID.DefaultCellStyle = dataGridViewCellStyle8;
+            this.book_ID.HeaderText = "Book ID";
+            this.book_ID.Name = "book_ID";
+            // 
+            // bookTitle
+            // 
+            dataGridViewCellStyle9.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.bookTitle.DefaultCellStyle = dataGridViewCellStyle9;
+            this.bookTitle.HeaderText = "Book Title";
+            this.bookTitle.Name = "bookTitle";
+            // 
+            // ResDate
+            // 
+            dataGridViewCellStyle10.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ResDate.DefaultCellStyle = dataGridViewCellStyle10;
+            this.ResDate.HeaderText = "Reserve Date";
+            this.ResDate.Name = "ResDate";
+            // 
+            // ReleaseDate
+            // 
+            dataGridViewCellStyle11.Alignment = System.Windows.Forms.DataGridViewContentAlignment.MiddleCenter;
+            this.ReleaseDate.DefaultCellStyle = dataGridViewCellStyle11;
+            this.ReleaseDate.HeaderText = "Release Date";
+            this.ReleaseDate.Name = "ReleaseDate";
             // 
             // UI
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(800, 450);
-            this.Controls.Add(this.label5);
-            this.Controls.Add(this.button1);
-            this.Controls.Add(this.textBox1);
-            this.Controls.Add(this.label3);
-            this.Controls.Add(this.label2);
-            this.Controls.Add(this.label1);
-            this.Controls.Add(this.label4);
+            this.Controls.Add(this.tabControl1);
             this.Name = "UI";
             this.Text = "SLibrary UI";
             this.Load += new System.EventHandler(this.Form1_Load);
+            this.tabControl1.ResumeLayout(false);
+            this.tabPage1.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.BookDGV)).EndInit();
+            this.Reservation.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.ReserveDGV)).EndInit();
             this.ResumeLayout(false);
-            this.PerformLayout();
 
         }
 
         #endregion
 
-        private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.Label label4;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Label label5;
+        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabPage tabPage1;
+        private System.Windows.Forms.TabPage Reservation;
+        private System.Windows.Forms.DataGridView BookDGV;
+        private System.Windows.Forms.Button addBook;
+        private System.Windows.Forms.DataGridViewTextBoxColumn BookID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Title;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Author;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Available;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Reserved;
+        private System.Windows.Forms.DataGridView ReserveDGV;
+        private System.Windows.Forms.Button release;
+        private System.Windows.Forms.Button reserve;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ClientName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn book_ID;
+        private System.Windows.Forms.DataGridViewTextBoxColumn bookTitle;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ResDate;
+        private System.Windows.Forms.DataGridViewTextBoxColumn ReleaseDate;
     }
 }
 
