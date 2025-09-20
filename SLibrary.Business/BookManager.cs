@@ -13,95 +13,91 @@ namespace SLibrary.Business
     public class BookManager
     {
         BookRepository repo = new BookRepository();
-        List<Book> books = new List<Book>();
+        private int clientId = 1;  
 
         public BookManager()
         {
-            books = repo.LoadBooksFromFile();
+
         }
         public void Add(Book b)
-
         {
-            bool found = false;
-            foreach (Book b2 in books)
-            {
-                if (b.Title == b2.Title)
-                {
-                    found = true;
-                    b2.AvailableCount++;
-                    b.ID = b2.ID;
-                    break;
-                }
-            }
-            if (found != true)
-            {
-                if (books.Count > 0)
-                {
-                    var maxId = books.Max(i => i.ID);
-                    b.ID = maxId + 1;
-                }
-                else
-                {
-                    b.ID = 1;
-                }
-                books.Add(b);
-            }
-            repo.SaveBooksToFile(books);
+            repo.Add(b);
 
         }
 
-        public string ReserveBook(string title)
+        public string ReserveBook(string title , string clientName)
         {
-            foreach (Book b in books)
+            Book temp = repo.GetByName(title);
+            if (temp != null)
             {
-                if (b.Title == title)
+                if (temp.AvailableCount > 0)
                 {
-                    if (b.AvailableCount > 0)
-                    {
-                        b.ReservedCount++;
-                        b.AvailableCount--;
-                        repo.SaveBooksToFile(books);
-                        return "Book Reserved Successfully !!";
-                    }
-                    else
-                        return "Book Can Not be Reserved ";
+                    temp.ReservedCount++;
+                    temp.AvailableCount--;
+                    int id = clientId++;
+                    Reservation r = new Reservation(id, clientName, temp.ID, temp.Title, DateTime.Now);
+                    repo.SaveBooksToFile();
+                    repo.AddReservation(r);
+                    repo.SaveReservationsToFile();
+                    return "Book Reserved Successfully !!\n";
                 }
+                else
+                    return "Book Can Not be Reserved\n";
             }
-            return "Book Not Found";
+            return "Book Not Found\n";
         }
 
         public override string ToString()
         {
-            if (books.Count == 0)
+            if (repo.BookCount() == 0)
                 return "No books available.";
+
+            List<Book> books = repo.GetList();
 
             StringBuilder sb = new StringBuilder();
             foreach (Book b in books)
             {
-                sb.AppendLine($"ID: {b.ID}, Title: {b.Title}, Reserved: {b.ReservedCount}, Available: {b.AvailableCount}");
+                sb.AppendLine($"ID: {b.ID}, Title: {b.Title},Author: {b.Author}, Reserved: {b.ReservedCount}, Available: {b.AvailableCount}");
             }
             return sb.ToString();
 
         }
 
-        public string ReleaseBook(string title)
+        public string ReleaseBook(string title, string clientName)
         {
-            foreach (Book b in books)
+            Book temp = repo.GetByName(title);
+            if (temp != null)
             {
-                if (b.Title == title)
+                if (temp.ReservedCount > 0)
                 {
-                    if (b.ReservedCount > 0)
-                    {
-                        b.ReservedCount--;
-                        b.AvailableCount++;
-                        repo.SaveBooksToFile(books);
-                        return "Book Released Successfully !!";
-                    }
-                    else
-                        return "There is NO Book to Release";
+                    Reservation res = repo.GetReservation().Where(r => r.BookTitle == title&& r.ClientName == clientName&& r.ReleaseDate == null)
+                          .OrderByDescending(r => r.ReservedDate)
+                          .FirstOrDefault();
+                    if (res == null)
+                        return "No active reservation found !!\n";
+
+                    temp.ReservedCount--;
+                    temp.AvailableCount++;
+
+                    res.ReleaseDate = DateTime.Now;
+                    repo.SaveBooksToFile();
+                    repo.SaveReservationsToFile();
+                    return "Book Released Successfully !!\n";
                 }
+                else
+                    return "There is NO Book to Release\n";
             }
-            return "Book Not found";
+            return "Book Not Found\n";
+        }
+
+        public List<Book> GetAllBooks()
+        {
+            return repo.GetList();
+        }
+
+        public List<Reservation> GetAllReservations()
+        {
+            return repo.GetReservation();
         }
     }
 }
