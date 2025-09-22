@@ -86,45 +86,71 @@ namespace SLibraryUI
             }
         }
 
-        private void Reserve_Click(object sender, EventArgs e)
-        {
-            using (Actions form = new Actions("Reserve"))
-            {
-                if (form.ShowDialog() == DialogResult.OK)
-                {
-                    string result = bookMng.ReserveBook(form.bookTitle , form.clientName);
-                    MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
-                     ? MessageBoxIcon.Information
-                    : MessageBoxIcon.Warning);
-                    FillBookGrid();
-                    FillReserveGrid();
-                }
-                else
-                { }
-            }
-        }
-
         private void Release_Click(object sender, EventArgs e)
         {
-            using (Actions form = new Actions("Release"))
+            if (ReserveDGV.SelectedRows.Count > 0)
             {
-                if (form.ShowDialog() == DialogResult.OK)
+                DataGridViewRow row = ReserveDGV.SelectedRows[0];
+
+                string title = row.Cells["bookTitle"].Value.ToString();
+                string name = row.Cells["ClientName"].Value.ToString();
+
+                using (Actions form = new Actions("Release", title, name))
                 {
-                    string result = bookMng.ReleaseBook(form.bookTitle, form.clientName);
-                    MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
-                     ? MessageBoxIcon.Information
-                    : MessageBoxIcon.Warning);
-                    FillBookGrid();
-                    FillReserveGrid();
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        string result = bookMng.ReleaseBook(title,name);
+                        MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
+                         ? MessageBoxIcon.Information
+                        : MessageBoxIcon.Warning);
+                        FillBookGrid();
+                        FillReserveGrid();
+                    }
+                    else
+                    { }
                 }
-                else
-                { }
             }
+            else
+            {
+                MessageBox.Show("Please select a Book first.", "Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
         }
 
         private void ReserveDGV_CellContentClick(object sender, DataGridViewCellEventArgs e)
         {
 
         }
+
+        private void Reservebutton_Click(object sender, EventArgs e)
+        {
+            if (BookDGV.SelectedRows.Count > 0)
+            {
+                DataGridViewRow row = BookDGV.SelectedRows[0];
+
+                string title = row.Cells["Title"].Value.ToString();
+
+                using (Actions form = new Actions("Reserve", title))
+                {
+                    if (form.ShowDialog() == DialogResult.OK)
+                    {
+                        string result = bookMng.ReserveBook(title, form.clientName);
+                        MessageBox.Show(result, "Reservation Status", MessageBoxButtons.OK, result.Contains("Successfully")
+                         ? MessageBoxIcon.Information
+                        : MessageBoxIcon.Warning);
+                        FillBookGrid();
+                        FillReserveGrid();
+                    }
+                    else
+                    { }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Please select a Book first.","Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+
+        }
+
     }
 }
