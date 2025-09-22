@@ -10,9 +10,18 @@ using Shared;
 
 namespace SLibrary.Business
 {
-    public class BookManager
+    public interface IBookManager
     {
-        BookRepository repo = new BookRepository();
+        void Add(Book b);
+        string ReserveBook(string title, string clientName);
+        string ReleaseBook(string title, string clientName);
+        string ToString();
+
+    }
+    public class BookManager : IBookManager
+    {
+        IBookRepository bookRepo = new BookRepository();
+        IReservationRepository reservationRepo = new ReservationRepository();
         private int clientId = 1;  
 
         public BookManager()
@@ -21,24 +30,23 @@ namespace SLibrary.Business
         }
         public void Add(Book b)
         {
-            repo.Add(b);
+            bookRepo.Add(b);
 
         }
 
         public string ReserveBook(string title , string clientName)
         {
-            Book temp = repo.GetByName(title);
+            Book temp = bookRepo.GetByName(title);
             if (temp != null)
             {
                 if (temp.AvailableCount > 0)
                 {
                     temp.ReservedCount++;
                     temp.AvailableCount--;
-                    int id = clientId++;
-                    Reservation r = new Reservation(id, clientName, temp.ID, temp.Title, DateTime.Now);
-                    repo.SaveBooksToFile();
-                    repo.AddReservation(r);
-                    repo.SaveReservationsToFile();
+                    Reservation r = new Reservation(clientId, clientName, temp.ID, temp.Title, DateTime.Now);
+                    bookRepo.Save();
+                    reservationRepo.Add(r);
+                    reservationRepo.Save();
                     return "Book Reserved Successfully !!\n";
                 }
                 else
@@ -47,30 +55,14 @@ namespace SLibrary.Business
             return "Book Not Found\n";
         }
 
-        public override string ToString()
-        {
-            if (repo.BookCount() == 0)
-                return "No books available.";
-
-            List<Book> books = repo.GetList();
-
-            StringBuilder sb = new StringBuilder();
-            foreach (Book b in books)
-            {
-                sb.AppendLine($"ID: {b.ID}, Title: {b.Title},Author: {b.Author}, Reserved: {b.ReservedCount}, Available: {b.AvailableCount}");
-            }
-            return sb.ToString();
-
-        }
-
         public string ReleaseBook(string title, string clientName)
         {
-            Book temp = repo.GetByName(title);
+            Book temp = bookRepo.GetByName(title);
             if (temp != null)
             {
                 if (temp.ReservedCount > 0)
                 {
-                    Reservation res = repo.GetReservation().Where(r => r.BookTitle == title&& r.ClientName == clientName&& r.ReleaseDate == null)
+                    Reservation res = reservationRepo.GetReservation().Where(r => r.BookTitle == title&& r.ClientName == clientName&& r.ReleaseDate == null)
                           .OrderByDescending(r => r.ReservedDate)
                           .FirstOrDefault();
                     if (res == null)
@@ -80,8 +72,8 @@ namespace SLibrary.Business
                     temp.AvailableCount++;
 
                     res.ReleaseDate = DateTime.Now;
-                    repo.SaveBooksToFile();
-                    repo.SaveReservationsToFile();
+                    bookRepo.Save();
+                    reservationRepo.Save();
                     return "Book Released Successfully !!\n";
                 }
                 else
@@ -90,14 +82,29 @@ namespace SLibrary.Business
             return "Book Not Found\n";
         }
 
+        public override string ToString()
+        {
+            if (bookRepo.BookCount() == 0)
+                return "No books available.";
+
+            List<Book> books = bookRepo.GetList();
+
+            StringBuilder sb = new StringBuilder();
+            foreach (Book b in books)
+            {
+                sb.AppendLine($"ID: {b.ID}, Title: {b.Title},Author: {b.Author}, Reserved: {b.ReservedCount}, Available: {b.AvailableCount}");
+            }
+            return sb.ToString();
+
+        }
         public List<Book> GetAllBooks()
         {
-            return repo.GetList();
+            return bookRepo.GetList();
         }
 
         public List<Reservation> GetAllReservations()
         {
-            return repo.GetReservation();
+            return reservationRepo.GetReservation();
         }
     }
 }
