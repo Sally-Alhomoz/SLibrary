@@ -11,26 +11,23 @@ namespace SLibrary.DataAccess
 {
     public interface IBookRepository
     {
-        void SaveBooksToFile();
+        void Save();
 
-        void LoadBooksFromFile();
-        void SaveReservationsToFile();
-
-        void LoadReservationsFromFile();
+        void Load();
+        void Add(Book b);
+        Book GetByName(string title);
+        int BookCount();
+        List<Book> GetList();
     }
     public class BookRepository : IBookRepository
     {
         static string filePath = "BooksData.csv";
-        static string filePath2 = "ReservationsData.csv";
         private List<Book> books = new List<Book>();
-        private List<Reservation> reservations = new List<Reservation>();
         public BookRepository()
         {
-           LoadBooksFromFile();
-            LoadReservationsFromFile();
-           
+           Load();
         }
-        public void SaveBooksToFile()
+        public void Save()
         {
 
             List<string> lines = new List<string>();
@@ -43,7 +40,7 @@ namespace SLibrary.DataAccess
             File.WriteAllLines(filePath, lines);
         }
 
-        public void LoadBooksFromFile()
+        public void Load()
         {
             if (File.Exists(filePath))
             {
@@ -58,39 +55,6 @@ namespace SLibrary.DataAccess
                 }
             }
         }
-
-        public void SaveReservationsToFile()
-        {
-
-            List<string> lines = new List<string>();
-            lines.Add($"ID,Client_Name,Book_ID,Book_Title,Reserved_Date,Released_Date");
-
-            foreach (Reservation r in reservations)
-            {
-                string released = r.ReleaseDate.HasValue ? r.ReleaseDate.Value.ToString() : "-";
-                lines.Add($"{r.ClientID},{r.ClientName},{r.BookID},{r.BookTitle},{r.ReservedDate},{released}");
-            }
-            File.WriteAllLines(filePath2, lines);
-        }
-
-        public void LoadReservationsFromFile()
-        {
-            if (File.Exists(filePath2))
-            {
-                string[] lines = File.ReadAllLines(filePath2);
-                foreach (string line in lines.Skip(1))
-                {
-                    var parts = line.Split(',');
-                    if (parts.Length < 5)
-                        continue;
-                    DateTime? releaseDate = parts[5] == "-" ? (DateTime?)null : DateTime.Parse(parts[5]);
-                    Reservation r = new Reservation(int.Parse(parts[0]), parts[1], int.Parse(parts[2]),parts[3], DateTime.Parse(parts[4]));
-                    r.ReleaseDate = releaseDate;
-                    reservations.Add(r);
-                }
-            }
-        }
-
 
         public void Add(Book b)
         {
@@ -118,13 +82,8 @@ namespace SLibrary.DataAccess
                 }
                 books.Add(b);
             }
-            SaveBooksToFile();
+            Save();
 
-        }
-        public void AddReservation(Reservation r)
-        {
-            reservations.Add(r);
-            SaveReservationsToFile();
         }
 
         public Book GetByName(string title)
@@ -145,11 +104,6 @@ namespace SLibrary.DataAccess
         public List<Book> GetList()
         {
             return books;
-        }
-
-        public List<Reservation> GetReservation()
-        {
-            return reservations;
         }
     }
 }
