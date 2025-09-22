@@ -15,7 +15,7 @@ namespace SLibraryUI
     public partial class Actions : Form
     {
         private BookManager bookMng = new BookManager();
-        public string clientName => clientNametxt.Text.Trim();
+        public string clientName => txtclientNamet.Text.Trim();
         public string Mode { get; set; }
         public Actions(string mode , string title, string clientName ="" )
         {
@@ -25,8 +25,8 @@ namespace SLibraryUI
 
             if(Mode == "Release")
             {
-                clientNametxt.Text = clientName;
-                clientNametxt.ReadOnly = true;
+                txtclientNamet.Text = clientName;
+                txtclientNamet.ReadOnly = true;
             }
 
         }
@@ -47,7 +47,7 @@ namespace SLibraryUI
 
         private void Confirmbutton_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(clientNametxt.Text))
+            if (string.IsNullOrWhiteSpace(txtclientNamet.Text))
             {
                 MessageBox.Show("Please enter Name.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;

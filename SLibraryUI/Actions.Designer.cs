@@ -32,7 +32,7 @@
             this.confirmButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.clientNametxt = new System.Windows.Forms.TextBox();
+            this.txtclientNamet = new System.Windows.Forms.TextBox();
             this.BookTitle = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
@@ -78,12 +78,12 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Book Title ";
             // 
-            // clientNametxt
+            // txtclientNamet
             // 
-            this.clientNametxt.Location = new System.Drawing.Point(253, 129);
-            this.clientNametxt.Name = "clientNametxt";
-            this.clientNametxt.Size = new System.Drawing.Size(115, 20);
-            this.clientNametxt.TabIndex = 10;
+            this.txtclientNamet.Location = new System.Drawing.Point(253, 129);
+            this.txtclientNamet.Name = "txtclientNamet";
+            this.txtclientNamet.Size = new System.Drawing.Size(115, 20);
+            this.txtclientNamet.TabIndex = 10;
             // 
             // BookTitle
             // 
@@ -105,7 +105,7 @@
             this.Controls.Add(this.confirmButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.clientNametxt);
+            this.Controls.Add(this.txtclientNamet);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Actions";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -122,7 +122,7 @@
         private System.Windows.Forms.Button confirmButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox clientNametxt;
+        private System.Windows.Forms.TextBox txtclientNamet;
         private System.Windows.Forms.Label BookTitle;
     }
 }
