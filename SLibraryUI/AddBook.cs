@@ -12,8 +12,8 @@ namespace SLibraryUI
 {
     public partial class AddBook : Form
     {
-        public string BookTitle => textBox1.Text.Trim();
-        public string BookAuthor => textBox2.Text.Trim();
+        public string BookTitle => txtTitle.Text.Trim();
+        public string BookAuthor => txtAuther.Text.Trim();
         public AddBook()
         {
             InitializeComponent();
@@ -26,7 +26,7 @@ namespace SLibraryUI
 
         private void OK_Click(object sender, EventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text))
+            if (string.IsNullOrWhiteSpace(txtTitle.Text) || string.IsNullOrWhiteSpace(txtAuther.Text))
             {
                 MessageBox.Show("Please enter both Title and Author.", "Input Required", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 return;

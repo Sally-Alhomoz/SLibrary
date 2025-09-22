@@ -30,8 +30,8 @@
         {
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
-            this.textBox1 = new System.Windows.Forms.TextBox();
-            this.textBox2 = new System.Windows.Forms.TextBox();
+            this.txtTitle = new System.Windows.Forms.TextBox();
+            this.txtAuther = new System.Windows.Forms.TextBox();
             this.OK = new System.Windows.Forms.Button();
             this.cancel = new System.Windows.Forms.Button();
             this.SuspendLayout();
@@ -60,17 +60,17 @@
             // 
             // textBox1
             // 
-            this.textBox1.Location = new System.Drawing.Point(219, 49);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(147, 20);
-            this.textBox1.TabIndex = 2;
+            this.txtTitle.Location = new System.Drawing.Point(219, 49);
+            this.txtTitle.Name = "textBox1";
+            this.txtTitle.Size = new System.Drawing.Size(147, 20);
+            this.txtTitle.TabIndex = 2;
             // 
             // textBox2
             // 
-            this.textBox2.Location = new System.Drawing.Point(219, 103);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(147, 20);
-            this.textBox2.TabIndex = 3;
+            this.txtAuther.Location = new System.Drawing.Point(219, 103);
+            this.txtAuther.Name = "textBox2";
+            this.txtAuther.Size = new System.Drawing.Size(147, 20);
+            this.txtAuther.TabIndex = 3;
             // 
             // OK
             // 
@@ -101,8 +101,8 @@
             this.ClientSize = new System.Drawing.Size(456, 287);
             this.Controls.Add(this.cancel);
             this.Controls.Add(this.OK);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.txtAuther);
+            this.Controls.Add(this.txtTitle);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
@@ -120,8 +120,8 @@
 
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;
-        private System.Windows.Forms.TextBox textBox1;
-        private System.Windows.Forms.TextBox textBox2;
+        private System.Windows.Forms.TextBox txtTitle;
+        private System.Windows.Forms.TextBox txtAuther;
         private System.Windows.Forms.Button OK;
         private System.Windows.Forms.Button cancel;
     }
