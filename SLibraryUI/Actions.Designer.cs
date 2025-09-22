@@ -32,8 +32,8 @@
             this.confirmButton = new System.Windows.Forms.Button();
             this.label2 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.textBox2 = new System.Windows.Forms.TextBox();
-            this.textBox1 = new System.Windows.Forms.TextBox();
+            this.clientNametxt = new System.Windows.Forms.TextBox();
+            this.BookTitle = new System.Windows.Forms.Label();
             this.SuspendLayout();
             // 
             // CancelButton
@@ -78,31 +78,34 @@
             this.label1.TabIndex = 11;
             this.label1.Text = "Book Title ";
             // 
-            // textBox2
+            // clientNametxt
             // 
-            this.textBox2.Location = new System.Drawing.Point(253, 129);
-            this.textBox2.Name = "textBox2";
-            this.textBox2.Size = new System.Drawing.Size(115, 20);
-            this.textBox2.TabIndex = 10;
+            this.clientNametxt.Location = new System.Drawing.Point(253, 129);
+            this.clientNametxt.Name = "clientNametxt";
+            this.clientNametxt.Size = new System.Drawing.Size(115, 20);
+            this.clientNametxt.TabIndex = 10;
             // 
-            // textBox1
+            // BookTitle
             // 
-            this.textBox1.Location = new System.Drawing.Point(253, 59);
-            this.textBox1.Name = "textBox1";
-            this.textBox1.Size = new System.Drawing.Size(115, 20);
-            this.textBox1.TabIndex = 9;
+            this.BookTitle.AutoSize = true;
+            this.BookTitle.Font = new System.Drawing.Font("Segoe UI Semibold", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.BookTitle.Location = new System.Drawing.Point(291, 58);
+            this.BookTitle.Name = "BookTitle";
+            this.BookTitle.Size = new System.Drawing.Size(54, 21);
+            this.BookTitle.TabIndex = 15;
+            this.BookTitle.Text = "label3";
             // 
             // Actions
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(484, 288);
+            this.Controls.Add(this.BookTitle);
             this.Controls.Add(this.CancelButton);
             this.Controls.Add(this.confirmButton);
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
-            this.Controls.Add(this.textBox2);
-            this.Controls.Add(this.textBox1);
+            this.Controls.Add(this.clientNametxt);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
             this.Name = "Actions";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
@@ -119,7 +122,7 @@
         private System.Windows.Forms.Button confirmButton;
         private System.Windows.Forms.Label label2;
         private System.Windows.Forms.Label label1;
-        private System.Windows.Forms.TextBox textBox2;
-        private System.Windows.Forms.TextBox textBox1;
+        private System.Windows.Forms.TextBox clientNametxt;
+        private System.Windows.Forms.Label BookTitle;
     }
 }
