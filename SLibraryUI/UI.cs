@@ -76,8 +76,7 @@ namespace SLibraryUI
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    int newId = bookMng.GetAllBooks().Count + 1;
-                    Book newBook = new Book(newId, form.BookTitle, form.BookAuthor, 1, 0);
+                    Book newBook = new Book(0, form.BookTitle, form.BookAuthor, 1, 0);
                     bookMng.Add(newBook);
                     FillBookGrid();
                 }
