@@ -41,12 +41,10 @@ namespace SLibrary.Business
             {
                 if (temp.AvailableCount > 0)
                 {
-                    temp.ReservedCount++;
-                    temp.AvailableCount--;
+                    bookRepo.UpdateCounts(temp.ID, temp.AvailableCount - 1, temp.ReservedCount + 1);
+
                     Reservation r = new Reservation(clientId, clientName, temp.ID, temp.Title, DateTime.Now);
-                    bookRepo.Save();
                     reservationRepo.Add(r);
-                    reservationRepo.Save();
                     return "Book Reserved Successfully !!\n";
                 }
                 else
@@ -62,18 +60,15 @@ namespace SLibrary.Business
             {
                 if (temp.ReservedCount > 0)
                 {
-                    Reservation res = reservationRepo.GetReservation().Where(r => r.BookTitle == title&& r.ClientName == clientName&& r.ReleaseDate == null)
-                          .OrderByDescending(r => r.ReservedDate)
-                          .FirstOrDefault();
+                    Reservation res = reservationRepo.GetActiveReservation(title, clientName);
+
                     if (res == null)
                         return "No active reservation found !!\n";
 
-                    temp.ReservedCount--;
-                    temp.AvailableCount++;
+                    bookRepo.UpdateCounts(temp.ID, temp.AvailableCount + 1, temp.ReservedCount - 1);
 
                     res.ReleaseDate = DateTime.Now;
-                    bookRepo.Save();
-                    reservationRepo.Save();
+                    reservationRepo.Update(res);
                     return "Book Released Successfully !!\n";
                 }
                 else
