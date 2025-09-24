@@ -20,13 +20,14 @@ namespace SLibrary.Business
     }
     public class BookManager : IBookManager
     {
-        IBookRepository bookRepo = new BookRepository();
-        IReservationRepository reservationRepo = new ReservationRepository();
+        IBookRepository bookRepo;
+        IReservationRepository reservationRepo;
         private int clientId = 1;  
 
         public BookManager()
         {
-
+            bookRepo =RepositoryFactory.CreateBookRepository();
+            reservationRepo = RepositoryFactory.CreateReservationRepository();
         }
         public void Add(Book b)
         {
