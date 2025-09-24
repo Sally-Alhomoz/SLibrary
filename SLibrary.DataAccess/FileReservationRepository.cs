@@ -13,10 +13,11 @@ namespace SLibrary.DataAccess
     public class FileReservationRepository : IReservationRepository
     {
         private string filePath;
-
+        private List<Reservation> reservations;
         public FileReservationRepository(string filepath)
         {
             filePath = filepath;
+            reservations = Load();
         }
         public List<Reservation> Load()
         {
@@ -41,19 +42,17 @@ namespace SLibrary.DataAccess
         }
         public void Add(Reservation r)
         {
-            List<Reservation> list = Load();
-
-            if (list.Count > 0)
+            if (reservations.Count > 0)
             {
-                var maxID = list.Max(i => i.ClientID);
+                var maxID = reservations.Max(i => i.ClientID);
                 r.ClientID = maxID + 1;
             }
             else
             {
                 r.ClientID = 1;
             }
-            list.Add(r);
-            Save(list);
+            reservations.Add(r);
+            Save(reservations);
         }
         public List<Reservation> GetReservation()
         {
@@ -62,8 +61,7 @@ namespace SLibrary.DataAccess
 
         public Reservation GetActiveReservation(string title, string clientName)
         {
-            List<Reservation> list = Load();
-            foreach(Reservation r in list)
+            foreach(Reservation r in reservations)
             {
                 if (r.BookTitle == title && r.ClientName == clientName && r.ReleaseDate == null)
                 {
@@ -74,8 +72,7 @@ namespace SLibrary.DataAccess
         }
         public void Update(Reservation r)
         {
-            List<Reservation> list = Load();
-            foreach (Reservation res in list)
+            foreach (Reservation res in reservations)
             {
                 if (res.ClientID == r.ClientID)
                 {
@@ -85,7 +82,7 @@ namespace SLibrary.DataAccess
                     res.ReservedDate = r.ReservedDate;
                     res.ReleaseDate = DateTime.Now;
 
-                    Save(list);
+                    Save(reservations);
                     break;
                 }
             }

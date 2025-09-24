@@ -13,9 +13,11 @@ namespace SLibrary.DataAccess
     internal class FileBookRepository : IBookRepository
     {
         private string filePath;
+        private List<Book> books;
         public FileBookRepository(string filepath)
         {
             filePath = filepath;
+            books = Load();
         }
 
         public List<Book> Load()
@@ -42,8 +44,7 @@ namespace SLibrary.DataAccess
         public void Add(Book b)
         {
             bool found = false;
-            List<Book> list = Load();
-            foreach(Book book in list)
+            foreach(Book book in books)
             {
                 if(book.Title == b.Title && book.Author == b.Author)
                 {
@@ -55,23 +56,22 @@ namespace SLibrary.DataAccess
             }
             if(!found == true)
             {
-                if (list.Count > 0)
+                if (books.Count > 0)
                 {
-                    var maxId = list.Max(i => i.ID);
+                    var maxId = books.Max(i => i.ID);
                     b.ID = maxId + 1;
                 }
                 else
                 {
                     b.ID = 1;
                 }
-                list.Add(b);
+                books.Add(b);
             }
-            Save(list);
+            Save(books);
         }
         public Book GetByName(string title)
         {
-            List<Book> list = Load();
-            foreach(Book b in list)
+            foreach(Book b in books)
             {
                 if (b.Title == title)
                     return b;
@@ -88,15 +88,14 @@ namespace SLibrary.DataAccess
         }
         public void UpdateCounts(int bookId, int available, int reserved)
         {
-            List<Book> list = Load();
 
-            Book found = list.FirstOrDefault(x => x.ID == bookId);
+            Book found = books.FirstOrDefault(x => x.ID == bookId);
 
             if(found != null)
             {
                 found.AvailableCount = available;
                 found.ReservedCount = reserved;
-                Save(list);
+                Save(books);
             }
         }
     }
