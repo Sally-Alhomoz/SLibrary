@@ -44,12 +44,12 @@ namespace SLibrary.DataAccess
         {
             if (reservations.Count > 0)
             {
-                var maxID = reservations.Max(i => i.ClientID);
-                r.ClientID = maxID + 1;
+                var maxID = reservations.Max(i => i.ID);
+                r.ID = maxID + 1;
             }
             else
             {
-                r.ClientID = 1;
+                r.ID = 1;
             }
             reservations.Add(r);
             Save(reservations);
@@ -74,7 +74,7 @@ namespace SLibrary.DataAccess
         {
             foreach (Reservation res in reservations)
             {
-                if (res.ClientID == r.ClientID)
+                if (res.ID == r.ID)
                 {
                     res.BookTitle = r.BookTitle;
                     res.ClientName = r.ClientName;

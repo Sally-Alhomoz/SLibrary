@@ -1,7 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -33,7 +33,7 @@ namespace SLibrary.DataAccess
                     {
                         Reservation res = new Reservation()
                         {
-                            ClientID = (int)reader["ID"],
+                            ID = (int)reader["ID"],
                             ClientName = (string)reader["Client_Name"],
                             BookID = (int)reader["Book_ID"],
                             BookTitle = (string)reader["Book_Title"],
@@ -85,7 +85,7 @@ namespace SLibrary.DataAccess
                     {
                         Reservation res = new Reservation()
                         {
-                            ClientID = (int)reader["ID"],
+                            ID = (int)reader["ID"],
                             ClientName = (string)reader["Client_Name"],
                             BookID = (int)reader["Book_ID"],
                             BookTitle = (string)reader["Book_Title"],
@@ -117,7 +117,7 @@ namespace SLibrary.DataAccess
                         {
                             Reservation r = new Reservation()
                             {
-                                ClientID = (int)reader["ID"],
+                                ID = (int)reader["ID"],
                                 ClientName = (string)reader["Client_Name"],
                                 BookID = (int)reader["Book_ID"],
                                 BookTitle = (string)reader["Book_Title"],
@@ -141,7 +141,7 @@ namespace SLibrary.DataAccess
                 using (SqlCommand cmd = new SqlCommand(query, conn))
                 {
                     cmd.Parameters.AddWithValue("@rel", r.ReleaseDate.Value);
-                    cmd.Parameters.AddWithValue("@id", r.ClientID);
+                    cmd.Parameters.AddWithValue("@id", r.ID);
                     cmd.ExecuteNonQuery();
                 }
             }

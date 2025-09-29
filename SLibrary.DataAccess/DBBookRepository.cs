@@ -1,7 +1,7 @@
 ﻿using Shared;
 using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
+using Microsoft.Data.SqlClient;
 using System.Data;
 using System.Linq;
 using System.Text;
@@ -37,8 +37,8 @@ namespace SLibrary.DataAccess
                                 ID = (int)reader["ID"],
                                 Title = (string)reader["Title"],
                                 Author = (string)reader["Author"],
-                                AvailableCount = (int)reader["Available"],
-                                ReservedCount = (int)reader["Reserved"]
+                                Available = (int)reader["Available"],
+                                Reserved = (int)reader["Reserved"]
                             };
                             books.Add(book);
                         }
@@ -85,8 +85,8 @@ namespace SLibrary.DataAccess
                 {
                     insertCmd.Parameters.AddWithValue("@title", b.Title);
                     insertCmd.Parameters.AddWithValue("@author", b.Author);
-                    insertCmd.Parameters.AddWithValue("@available", b.AvailableCount);
-                    insertCmd.Parameters.AddWithValue("@res", b.ReservedCount);
+                    insertCmd.Parameters.AddWithValue("@available", b.Available);
+                    insertCmd.Parameters.AddWithValue("@res", b.Reserved);
 
                     insertCmd.ExecuteNonQuery();
                 }
@@ -116,8 +116,8 @@ namespace SLibrary.DataAccess
                                 ID = (int)reader["ID"],
                                 Title = (string)reader["Title"],
                                 Author = (string)reader["Author"],
-                                AvailableCount = (int)reader["Available"],
-                                ReservedCount = (int)reader["Reserved"]
+                                Available = (int)reader["Available"],
+                                Reserved = (int)reader["Reserved"]
                             };
                             b = book;
                         }
@@ -160,8 +160,8 @@ namespace SLibrary.DataAccess
                             ID = (int)reader["ID"],
                             Title = (string)reader["Title"],
                             Author = (string)reader["Author"],
-                            AvailableCount = (int)reader["Available"],
-                            ReservedCount = (int)reader["Reserved"]
+                            Available = (int)reader["Available"],
+                            Reserved = (int)reader["Reserved"]
                         };
                         books.Add(book);
                     }

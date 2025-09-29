@@ -49,7 +49,7 @@ namespace SLibrary.DataAccess
                 if(book.Title == b.Title && book.Author == b.Author)
                 {
                     found = true;
-                    book.AvailableCount++;
+                    book.Available++;
                     b.ID = book.ID;
                     break;
                 }
@@ -93,8 +93,8 @@ namespace SLibrary.DataAccess
 
             if(found != null)
             {
-                found.AvailableCount = available;
-                found.ReservedCount = reserved;
+                found.Available = available;
+                found.Reserved= reserved;
                 Save(books);
             }
         }
