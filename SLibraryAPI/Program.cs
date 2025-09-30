@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using SLibrary.Business;
 using Shared;
+using System.Reflection;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -8,6 +9,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddDbContext<SLibararyDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
 
 builder.Services.AddScoped<BookManager>();
+
+builder.Services.AddSwaggerGen(c =>
+{
+    var xmlFilename = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    c.IncludeXmlComments(Path.Combine(AppContext.BaseDirectory, xmlFilename));
+});
 
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
