@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using SLibrary.Business;
 
 namespace SLibraryAPI.Controllers
@@ -14,7 +15,10 @@ namespace SLibraryAPI.Controllers
         {
             _bookManager = bookmng;
         }
-
+        
+        /// <summary>
+        /// Get all Reservations.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetReservations()
         {
@@ -23,7 +27,11 @@ namespace SLibraryAPI.Controllers
 
         }
 
-        [HttpGet("{id}")]
+        /// <summary>
+        /// Get a reservation by ID.
+        /// </summary>
+
+        [HttpGet("GetByID")]
         public async Task<IActionResult> GetReservation(int id)
         {
             var reservation = await _bookManager.GetReservationById(id);

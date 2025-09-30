@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using SLibrary.Business;
 
 namespace SLibraryAPI.Controllers
@@ -14,6 +15,9 @@ namespace SLibraryAPI.Controllers
             _bookManager = bookMng;
         }
 
+        /// <summary>
+        /// Get all books from the library.
+        /// </summary>
         [HttpGet]
         public async Task<IActionResult> GetBooks()
         {
@@ -21,7 +25,11 @@ namespace SLibraryAPI.Controllers
             return Ok(books);
         }
 
-        [HttpPost("Reserve")]
+        /// <summary>
+        /// Reserve a book from the library.
+        /// </summary>
+
+        [HttpPut("Reserve")]
         public async Task<IActionResult> ReserveBook(int bookid, string clientname)
         {
             var result = await _bookManager.Reserve(bookid, clientname);
@@ -34,7 +42,11 @@ namespace SLibraryAPI.Controllers
             return Ok("Book reserved successfully");
         }
 
-        [HttpPost("Release")]
+        /// <summary>
+        /// Release a book from the library.
+        /// </summary>
+
+        [HttpPut("Release")]
         public async Task<IActionResult> ReleaseBook(int bookid, string clientname)
         {
             var result = await _bookManager.Release(bookid, clientname);
@@ -46,6 +58,10 @@ namespace SLibraryAPI.Controllers
 
             return Ok("Book released successfully");
         }
+
+        /// <summary>
+        /// Add a book to the library.
+        /// </summary>
 
         [HttpPost("Add")]
         public async Task<IActionResult> AddBook(string name , string author)
