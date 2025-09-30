@@ -17,5 +17,10 @@
     <ProjectReference Include="..\SLibrary.Business\SLibrary.Business.csproj" />
     <ProjectReference Include="..\SLibrary.DataAccess\SLibrary.DataAccess.csproj" />
   </ItemGroup>
+	
+	<PropertyGroup>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
+	</PropertyGroup>
 
 </Project>
