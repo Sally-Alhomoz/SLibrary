@@ -8,6 +8,5 @@ namespace Shared
         public string Author { get; set; }
         public int Reserved { get; set; }
         public int Available { get; set; }
-
     }
 }
