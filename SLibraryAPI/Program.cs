@@ -1,14 +1,41 @@
 using Microsoft.EntityFrameworkCore;
 using SLibrary.Business;
-using Shared;
 using System.Reflection;
+using Microsoft.AspNetCore.Identity;
+using SLibraryAPI;
+using SLibrary.DataAccess.Interfacses;
+using SLibrary.DataAccess.Repositories;
+using SLibrary.DataAccess;
+using SLibrary.DataAccess.Models;
+using SLibrary.Business.Interfaces;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddDbContext<SLibararyDBContext>(op => op.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
+builder.Services.AddScoped<IBookManager, BookManager>();
+builder.Services.AddScoped<IReservationManager, ReservationManager>();
 
-builder.Services.AddScoped<BookManager>();
+string mode = builder.Configuration["Storage:Mode"] ?? "Database";
+
+if (mode == "File")
+{
+    string bookFile = builder.Configuration["Storage:BookFilePath"] ?? "books.json";
+    string resFile = builder.Configuration["Storage:ReservationFilePath"] ?? "reservations.json";
+
+    builder.Services.AddSingleton<IBookRepository>(new FileBookRepository(bookFile));
+    builder.Services.AddSingleton<IReservationRepository>(new FileReservationRepository(resFile));
+}
+else
+{
+    builder.Services.AddDbContext<SLibararyDBContext>(options =>
+        options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
+
+    builder.Services.AddScoped<IBookRepository, DBBookRepository>();
+    builder.Services.AddScoped<IReservationRepository, DBReservationRepository>();
+}
+
+
+builder.Services.AddIdentity<AppUser, IdentityRole>().AddEntityFrameworkStores<SLibararyDBContext>();
 
 builder.Services.AddSwaggerGen(c =>
 {
@@ -19,7 +46,9 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGenJwtAuthen();
+
+builder.Services.AddJwtAuthentication(builder.Configuration);
 
 var app = builder.Build();
 
@@ -32,6 +61,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
