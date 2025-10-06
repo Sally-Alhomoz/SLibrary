@@ -1,7 +1,9 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Shared;
 using SLibrary.Business;
+using SLibrary.Business.Interfaces;
 
 namespace SLibraryAPI.Controllers
 {
@@ -9,10 +11,12 @@ namespace SLibraryAPI.Controllers
     [ApiController]
     public class BooksController : ControllerBase
     {
-        private readonly BookManager _bookManager;
-        public BooksController(BookManager bookMng)
+        private readonly IBookManager _bookManager;
+        private readonly IReservationManager _reservationMng;
+        public BooksController(IBookManager bookMng , IReservationManager reservationMng)
         {
             _bookManager = bookMng;
+            _reservationMng = reservationMng;
         }
 
         /// <summary>
@@ -21,7 +25,7 @@ namespace SLibraryAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> GetBooks()
         {
-            var books = await _bookManager.GetBooks();
+            var books =  _bookManager.GetAllBooks();
             return Ok(books);
         }
 
@@ -29,44 +33,56 @@ namespace SLibraryAPI.Controllers
         /// Reserve a book from the library.
         /// </summary>
 
+        [Authorize]
         [HttpPut("Reserve")]
-        public async Task<IActionResult> ReserveBook(int bookid, string clientname)
+        public async Task<IActionResult> ReserveBook(string title, string clientname)
         {
-            var result = await _bookManager.Reserve(bookid, clientname);
+            var result = _reservationMng.ReserveBook(title, clientname);
 
-            if (result == false)
+            if(result.Contains("Successfully"))
+            {
+                return Ok("Book reserved successfully");
+            }
+            else
             {
                 return BadRequest("Book Can Not be reserved");
             }
 
-            return Ok("Book reserved successfully");
+            
         }
 
         /// <summary>
         /// Release a book from the library.
         /// </summary>
-
+        [Authorize]
         [HttpPut("Release")]
-        public async Task<IActionResult> ReleaseBook(int bookid, string clientname)
+        public async Task<IActionResult> ReleaseBook(string title, string clientname)
         {
-            var result = await _bookManager.Release(bookid, clientname);
+            var result = _reservationMng.ReleaseBook(title, clientname);
 
-            if (result == false)
+            if (result.Contains("Successfully"))
+            {
+                return Ok("Book released successfully");
+            }
+            else
             {
                 return BadRequest("Book Can Not be released");
             }
-
-            return Ok("Book released successfully");
         }
 
         /// <summary>
         /// Add a book to the library.
         /// </summary>
-
-        [HttpPost("Add")]
+        [Authorize]
+        [HttpPost]
         public async Task<IActionResult> AddBook(string name , string author)
         {
-            await _bookManager.Addbook(name, author);
+            CreateBookdto dto = new CreateBookdto
+            {
+                Title = name,
+                Author= author
+            };
+            _bookManager.Add(dto);
             return Ok("Book added successfully");
 
         }
