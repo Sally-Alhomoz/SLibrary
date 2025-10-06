@@ -21,6 +21,7 @@ namespace SLibrary.Business
         }
         public void Add(CreateBookdto b)
         {
+
             Book book = new Book
             {
                 Title = b.Title,
