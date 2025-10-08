@@ -5,9 +5,9 @@ namespace Shared
     public class dtoNewUser
     {
         [Required]
-        public string userName { get; set; }
+        public string Username { get; set; }
         [Required]
-        public string password { get; set; }
+        public string Password { get; set; }
 
         [Required]
         public string Email { get; set; }

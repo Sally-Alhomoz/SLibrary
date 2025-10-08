@@ -5,7 +5,7 @@ namespace Shared
     public class dtoLogin
     {
         [Required]
-        public string userName { get; set; }
+        public string Username { get; set; }
         [Required]
         public string password { get; set; }
 
