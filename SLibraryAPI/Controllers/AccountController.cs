@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
 using SLibrary.DataAccess.Models;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Shared;
+using SLibrary.Business.Interfaces;
+using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Linq;
 
 namespace SLibraryAPI.Controllers
 {
@@ -13,9 +15,9 @@ namespace SLibraryAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly UserManager<AppUser> _userManager;
+        private readonly IUserManager  _userManager;
         private readonly IConfiguration configuration;
-        public AccountController(UserManager<AppUser> userManager , IConfiguration config)
+        public AccountController(IUserManager userManager , IConfiguration config)
         {
             _userManager = userManager;
             configuration = config;
@@ -25,33 +27,16 @@ namespace SLibraryAPI.Controllers
         /// Register.
         /// </summary>
         [HttpPost("Register")]
-        public async Task<IActionResult> RegisterNewUser(dtoNewUser user)
+        public async Task<IActionResult> Create(dtoNewUser user)
         {
-            if (ModelState.IsValid)
-            {
-                AppUser appUser = new AppUser
-                {
-                    UserName = user.userName,
-                    Email = user.Email,
-                };
-                IdentityResult result = await _userManager.CreateAsync(appUser, user.password);
+            var exist = _userManager.GetByUsername(user.Username);
+            if (exist != null)
+                return BadRequest("Username already exists.");
 
-                if (result.Succeeded)
-                {
-                    return Ok("Success");
-                }
-                else
-                {
-                    foreach (var item in result.Errors)
-                    {
-                        ModelState.AddModelError("", item.Description);
-                    }
-                    return BadRequest(ModelState);
-                }
-            }
-            return BadRequest(ModelState);
+            _userManager.Add(user);
 
-        
+            return Ok(new { message = "User registered successfully" });
+
         }
 
         /// <summary>
@@ -61,55 +46,45 @@ namespace SLibraryAPI.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> LogIn(dtoLogin login)
         {
-            if(ModelState.IsValid)
+            var isValid = _userManager.Validatelogin(login);
+
+            if (!isValid)
+                return Unauthorized("Invalid username or password");
+
+            var u = _userManager.GetByUsername(login.Username);
+
+            var user = new Userdto
             {
-                AppUser user = await _userManager.FindByNameAsync(login.userName);
+                Id = u.Id,
+                Username = u.Username,
+                Role = u.Role
+            };
 
-                if(user != null)
-                {
-                    if (await _userManager.CheckPasswordAsync(user, login.password))
-                    {
-                        var claims = new List<Claim>();
-                        claims.Add(new Claim(ClaimTypes.Name, user.UserName));
-                        claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                        claims.Add(new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()));
-                        var roles = await _userManager.GetRolesAsync(user);
-                        foreach(var role in roles)
-                        {
-                            claims.Add(new Claim(ClaimTypes.Role, role.ToString()));
-                        }
-                        //signingCredentials
-                        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]));
-                        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+            var claims = new List<Claim>
+            {
+               new Claim(ClaimTypes.Name, user.Username),
+               new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
+               new Claim(ClaimTypes.Role, user.Role.ToString())
+            };
 
-                        var token = new JwtSecurityToken(
-                            claims: claims,
-                            issuer: configuration["JWT:Issuer"],
-                            audience: configuration["JWT:Audience"],
-                            expires: DateTime.UtcNow.AddHours(1),
-                            signingCredentials: creds
-                            );
-                        var _token = new
-                        {
-                            token = new JwtSecurityTokenHandler().WriteToken(token),
-                            expiration = token.ValidTo,
-                        };
+            var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["JWT:SecretKey"]));
+            var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-                        return Ok(_token);
+            var token = new JwtSecurityToken(
+                claims: claims,
+                issuer: configuration["JWT:Issuer"],
+                audience: configuration["JWT:Audience"],
+                expires: DateTime.UtcNow.AddHours(1),
+                signingCredentials: creds
+            );
 
-                    }
-                    else
-                    {
-                        return Unauthorized();
-                    }
-                }
-                else
-                {
-                    ModelState.AddModelError("", "User Name is invalid");
-                }
-            }
-            return BadRequest(ModelState);
+            return Ok(new
+            {
+                token = new JwtSecurityTokenHandler().WriteToken(token),
+                expiration = token.ValidTo
+            });
         }
 
+     
     }
 }
