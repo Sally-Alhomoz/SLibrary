@@ -1,7 +1,6 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Shared;
-using SLibrary.Business;
 using SLibrary.Business.Interfaces;
 
 namespace SLibraryAPI.Controllers
@@ -21,7 +20,7 @@ namespace SLibraryAPI.Controllers
         /// Get all Reservations.
         /// </summary>
         [HttpGet]
-        public async Task<IActionResult> GetReservations()
+        public async Task<IActionResult> Read()
         {
             var reservations = _reservationMng.GetAllReservations();
             return Ok(reservations);
@@ -38,6 +37,48 @@ namespace SLibraryAPI.Controllers
             var reservation = _reservationMng.GetReservationById(id);
             if (reservation == null) return NotFound();
             return Ok(reservation);
+        }
+
+
+        /// <summary>
+        /// Reserve a book from the library.
+        /// </summary>
+
+        [Authorize]
+        [HttpPost("Reserve")]
+        public async Task<IActionResult> Create(string title, string clientname)
+        {
+            var result = _reservationMng.ReserveBook(title, clientname);
+
+            if (result.Contains("Successfully"))
+            {
+                return Ok("Book reserved successfully");
+            }
+            else
+            {
+                return BadRequest("Book Can Not be reserved");
+            }
+
+
+        }
+
+        /// <summary>
+        /// Release a book from the library.
+        /// </summary>
+        [Authorize]
+        [HttpDelete("Release")]
+        public async Task<IActionResult> Delete(string title, string clientname)
+        {
+            var result = _reservationMng.ReleaseBook(title, clientname);
+
+            if (result.Contains("Successfully"))
+            {
+                return Ok("Book released successfully");
+            }
+            else
+            {
+                return BadRequest("Book Can Not be released");
+            }
         }
     }
 }
