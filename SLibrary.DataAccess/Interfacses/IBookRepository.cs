@@ -12,6 +12,8 @@ namespace SLibrary.DataAccess.Interfacses
         int BookCount();
         List<Book> GetBooks();
         void UpdateCounts(int bookId, int available, int reserved);
+        bool Delete(int id);
+        Book GetById(int id);
     }
 
 }
