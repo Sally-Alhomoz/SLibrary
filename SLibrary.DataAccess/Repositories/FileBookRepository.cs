@@ -100,6 +100,27 @@ namespace SLibrary.DataAccess.Repositories
                 Save(books);
             }
         }
+
+        public bool Delete(int id)
+        {
+            var book = books.FirstOrDefault(b => b.ID == id);
+            if (book == null)
+                return false;
+
+            books.Remove(book);
+            Save(books);
+            return true;
+        }
+
+       public Book GetById(int id)
+        {
+            foreach (Book b in books)
+            {
+                if (b.ID == id)
+                    return b;
+            }
+            return null;
+        }
     }
 
 }

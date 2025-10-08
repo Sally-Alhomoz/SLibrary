@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using Microsoft.EntityFrameworkCore;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
 
@@ -73,6 +74,24 @@ namespace SLibrary.DataAccess.Repositories
                 book.Reserved = reserved;
                 _db.SaveChanges();
             }
+        }
+
+        public bool Delete(int id)
+        {
+            var book = _db.Books.Find(id);
+
+            if (book == null)
+                return false;
+
+            _db.Books.Remove(book);
+            _db.SaveChanges();
+            return true;
+        }
+
+        public Book GetById(int id)
+        {
+            var book = _db.Books.Find(id);
+            return book;
         }
     }
 }
