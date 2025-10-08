@@ -8,4 +8,6 @@ public interface IBookManager
     string ToString();
     List<Bookdto> GetAllBooks();
 
+    string Delete(int id);
+
 }
