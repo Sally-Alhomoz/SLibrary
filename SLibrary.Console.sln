@@ -3,15 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34309.116
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLibraryConsole", "SLibrary.Console\SLibraryConsole.csproj", "{F23A2DAD-F41B-428D-B02B-3AC546074424}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLibraryConsole", "SLibrary.Console\SLibraryConsole.csproj", "{F23A2DAD-F41B-428D-B02B-3AC546074424}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLibrary.Business", "SLibrary.Business\SLibrary.Business.csproj", "{48EE08D7-0531-488F-B73E-19516F42B968}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLibrary.Business", "SLibrary.Business\SLibrary.Business.csproj", "{48EE08D7-0531-488F-B73E-19516F42B968}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLibrary.DataAccess", "SLibrary.DataAccess\SLibrary.DataAccess.csproj", "{4A093119-9EC2-4765-942D-86F969B236BE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLibrary.DataAccess", "SLibrary.DataAccess\SLibrary.DataAccess.csproj", "{4A093119-9EC2-4765-942D-86F969B236BE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Shared", "Shared\Shared.csproj", "{9DF894E8-7B2A-422E-95BF-693C0FE775D1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Shared", "Shared\Shared.csproj", "{9DF894E8-7B2A-422E-95BF-693C0FE775D1}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLibraryUI", "SLibraryUI\SLibraryUI.csproj", "{AADA7CC0-AEBC-49A0-B596-DC5DFC127719}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SLibraryUI", "SLibraryUI\SLibraryUI.csproj", "{AADA7CC0-AEBC-49A0-B596-DC5DFC127719}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SLibraryAPI", "SLibraryAPI\SLibraryAPI.csproj", "{13E664EC-3F5A-4346-9A1D-C01ED102C7A2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +41,10 @@ Global
 		{AADA7CC0-AEBC-49A0-B596-DC5DFC127719}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AADA7CC0-AEBC-49A0-B596-DC5DFC127719}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AADA7CC0-AEBC-49A0-B596-DC5DFC127719}.Release|Any CPU.Build.0 = Release|Any CPU
+		{13E664EC-3F5A-4346-9A1D-C01ED102C7A2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{13E664EC-3F5A-4346-9A1D-C01ED102C7A2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{13E664EC-3F5A-4346-9A1D-C01ED102C7A2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{13E664EC-3F5A-4346-9A1D-C01ED102C7A2}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

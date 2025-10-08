@@ -1,4 +1,4 @@
-﻿using SLibrary.Business;
+﻿using SLibrary.Business.Managers;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

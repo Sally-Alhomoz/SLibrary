@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.VisualBasic;
 using Shared;
-using SLibrary.Business;
+using SLibrary.Business.Managers;
 
 
 namespace SLibraryUI
@@ -52,7 +52,7 @@ namespace SLibraryUI
             BookDGV.Rows.Clear();
             foreach(Book b in bookMng.GetAllBooks())
             {
-                BookDGV.Rows.Add(b.ID, b.Title,b.Author, b.AvailableCount,b.ReservedCount);
+                BookDGV.Rows.Add(b.ID, b.Title,b.Author, b.Available,b.Reserved);
             }
         }
 
@@ -61,7 +61,7 @@ namespace SLibraryUI
             ReserveDGV.Rows.Clear();
             foreach (Reservation r in bookMng.GetAllReservations())
             {
-                ReserveDGV.Rows.Add(r.ClientID, r.ClientName, r.BookID, r.BookTitle, r.ReservedDate, r.ReleaseDate?.ToString() ?? "-");
+                ReserveDGV.Rows.Add(r.ID, r.ClientName, r.BookID, r.BookTitle, r.ReservedDate, r.ReleaseDate?.ToString() ?? "-");
             }
         }
 
@@ -76,7 +76,7 @@ namespace SLibraryUI
             {
                 if (form.ShowDialog() == DialogResult.OK)
                 {
-                    Book newBook = new Book(0, form.BookTitle, form.BookAuthor, 1, 0);
+                    Book newBook = new Book(form.BookTitle, form.BookAuthor, 1, 0);
                     bookMng.Add(newBook);
                     FillBookGrid();
                 }
