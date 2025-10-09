@@ -54,6 +54,10 @@ namespace SLibraryAPI.Controllers
             {
                 return Ok("Book reserved successfully");
             }
+            else if(result.Contains("Deleted"))
+            {
+                return BadRequest("Book Can Not be reserved - Deleted");
+            }
             else
             {
                 return BadRequest("Book Can Not be reserved");
