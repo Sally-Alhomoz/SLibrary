@@ -5,6 +5,9 @@ using SLibrary.Business.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
+using System.Text;
+
 
 namespace SLibrary.Business.Managers
 {
@@ -19,12 +22,13 @@ namespace SLibrary.Business.Managers
 
         public void Add(dtoNewUser u)
         {
+            var userId = Guid.NewGuid();
             var user = new User
             {
-                Id = Guid.NewGuid(),
+                Id = userId,
                 Username = u.Username,
                 Email = u.Email,
-                Password = u.Password,
+                Password = HashPassword(u.Password, userId.ToString()),
                 Role = Role.User,
                 Checksum = ""
             };
@@ -34,10 +38,12 @@ namespace SLibrary.Business.Managers
         public bool Validatelogin(dtoLogin user)
         {
             var exist = userRepo.GetByUsername(user.Username);
-            if (exist != null && exist.Password == user.password)
-                return true;
-            else
+            if (exist == null)
                 return false;
+
+            bool flag = VerifyPassword(user.password, exist.Id.ToString(), exist.Password);
+            return flag;
+        
            
         }
 
@@ -76,5 +82,32 @@ namespace SLibrary.Business.Managers
                Role=x.Role
             }).ToList();
         }
+
+        private string HashPassword(string pass, string id)
+        {
+            byte[] userid = Encoding.UTF8.GetBytes(id);
+
+            byte[] hashed = KeyDerivation.Pbkdf2(
+                password: pass,
+                salt: userid,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 32);
+
+            return Convert.ToBase64String(hashed);
+        }
+
+        public bool VerifyPassword(string pass, string id ,string storedhash)
+        {
+            byte[] userid = Encoding.UTF8.GetBytes(id);
+
+            var hashed = HashPassword(pass, id);
+
+            if (hashed == storedhash)
+                return true;
+            return false;
+        }
+
+
     }
 }
