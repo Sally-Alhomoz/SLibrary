@@ -26,7 +26,11 @@ namespace SLibrary.Business.Managers
             Book temp = bookRepo.GetByName(title);
             if (temp != null)
             {
-                if (temp.Available > 0)
+                if(temp.isDeleted)
+                {
+                    return "Book Not Found - Deleted\n";
+                }
+                else if (temp.Available > 0)
                 {
                     bookRepo.UpdateCounts(temp.ID, temp.Available - 1, temp.Reserved + 1);
 
