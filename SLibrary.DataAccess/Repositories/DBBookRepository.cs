@@ -83,7 +83,7 @@ namespace SLibrary.DataAccess.Repositories
             if (book == null)
                 return false;
 
-            _db.Books.Remove(book);
+            book.isDeleted = true;
             _db.SaveChanges();
             return true;
         }
