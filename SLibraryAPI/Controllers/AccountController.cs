@@ -8,6 +8,8 @@ using Shared;
 using SLibrary.Business.Interfaces;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
+using Microsoft.AspNetCore.Authorization;
+using SLibrary.Business.Managers;
 
 namespace SLibraryAPI.Controllers
 {
@@ -85,6 +87,37 @@ namespace SLibraryAPI.Controllers
             });
         }
 
-     
+        ///<summary>
+        ///Get all users.
+        ///</summary>
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Read()
+        {
+            var users = _userManager.GetAllUsers();
+            return Ok(users);
+        }
+
+        /// <summary>
+        /// Delete User.
+        /// </summary>
+
+        [HttpDelete]
+        [Authorize]
+        public async Task<IActionResult> Delete(string username)
+        {
+            var currentUser = HttpContext.User.Identity?.Name;
+            var user = _userManager.GetByUsername(currentUser);
+            if (user == null || user.Role != Role.Admin)
+                return StatusCode(403, "Only admins can delete users.");
+
+            var result = _userManager.Delete(username);
+            if(result.Contains("successfully"))
+                return Ok(result);
+            else
+                return BadRequest(result);
+        }
+
+
     }
 }
