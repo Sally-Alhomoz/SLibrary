@@ -12,5 +12,7 @@ namespace SLibrary.DataAccess.Models
         public string Author { get; set; }
         public int Reserved { get; set; }
         public int Available { get; set; }
+
+        public bool isDeleted { get; set; } = false;
     }
 }
