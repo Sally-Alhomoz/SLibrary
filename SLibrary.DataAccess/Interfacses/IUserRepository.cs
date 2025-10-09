@@ -8,5 +8,7 @@ namespace SLibrary.DataAccess.Interfacses
         List<User> GetUsers();
         void Add(User user);
         User GetByUsername(string name);
+
+        bool Delete(string username);
     }
 }

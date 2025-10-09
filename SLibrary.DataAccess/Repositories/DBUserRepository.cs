@@ -3,6 +3,7 @@ using SLibrary.DataAccess.Interfacses;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Shared;
 
 namespace SLibrary.DataAccess.Repositories
 {
@@ -37,6 +38,19 @@ namespace SLibrary.DataAccess.Repositories
         {
             var user = _db.Users.FirstOrDefault(x => x.Username == name);
             return user;
+        }
+
+
+        public bool Delete(string username)
+        {
+            var user = _db.Users.FirstOrDefault(x => x.Username == username);
+
+            if (user == null)
+                return false;
+
+            _db.Users.Remove(user);
+            _db.SaveChanges();
+            return true;
         }
     }
 }
