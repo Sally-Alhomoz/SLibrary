@@ -3,6 +3,8 @@ using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
 using SLibrary.Business.Interfaces;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace SLibrary.Business.Managers
 {
@@ -54,6 +56,25 @@ namespace SLibrary.Business.Managers
                 return user;
             }
             return null;
+        }
+
+        public string Delete(string username)
+        {
+            var flag = userRepo.Delete(username);
+            if (flag)
+                return "User deleted successfully";
+
+            return "Failed to delete user";
+        }
+
+        public List<Userdto> GetAllUsers()
+        {
+            return userRepo.GetUsers().Select(x => new Userdto
+            {
+               Id = x.Id,
+               Username=x.Username,
+               Role=x.Role
+            }).ToList();
         }
     }
 }

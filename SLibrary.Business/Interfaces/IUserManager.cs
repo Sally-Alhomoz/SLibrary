@@ -12,5 +12,8 @@ namespace SLibrary.Business.Interfaces
         void Add(dtoNewUser u);
         bool Validatelogin(dtoLogin user);
         Userdto GetByUsername(string name);
+
+        string Delete(string username);
+        List<Userdto> GetAllUsers();
     }
 }
