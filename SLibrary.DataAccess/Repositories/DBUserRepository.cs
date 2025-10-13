@@ -3,7 +3,9 @@ using SLibrary.DataAccess.Interfacses;
 using System.Collections.Generic;
 using System.Linq;
 using System;
+using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Shared;
+using System.Text;
 
 namespace SLibrary.DataAccess.Repositories
 {
@@ -51,6 +53,31 @@ namespace SLibrary.DataAccess.Repositories
             _db.Users.Remove(user);
             _db.SaveChanges();
             return true;
+        }
+
+        private string HashPassword(string pass, string id)
+        {
+            byte[] userid = Encoding.UTF8.GetBytes(id);
+
+            byte[] hashed = KeyDerivation.Pbkdf2(
+                password: pass,
+                salt: userid,
+                prf: KeyDerivationPrf.HMACSHA256,
+                iterationCount: 100000,
+                numBytesRequested: 32);
+
+            return Convert.ToBase64String(hashed);
+        }
+
+        public bool VerifyPassword(string pass, string id, string storedhash)
+        {
+            byte[] userid = Encoding.UTF8.GetBytes(id);
+
+            var hashed = HashPassword(pass, id);
+
+            if (hashed == storedhash)
+                return true;
+            return false;
         }
     }
 }
