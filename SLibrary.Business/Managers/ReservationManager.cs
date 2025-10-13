@@ -7,6 +7,7 @@ using Shared;
 using System.Linq;
 using System.Collections.Immutable;
 using SLibrary.Business.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace SLibrary.Business.Managers
 {
@@ -14,20 +15,24 @@ namespace SLibrary.Business.Managers
     {
         IReservationRepository reservationRepo;
         IBookRepository bookRepo;
+        private readonly ILogger<ReservationManager> _logger;
 
-        public ReservationManager(IReservationRepository Rrepo, IBookRepository Brepo)
+        public ReservationManager(IReservationRepository Rrepo, IBookRepository Brepo, ILogger<ReservationManager> logger)
         {
             reservationRepo = Rrepo;
             bookRepo = Brepo;
+            _logger = logger;
         }
 
         public string ReserveBook(string title, string clientName)
         {
+            _logger.LogInformation("Reserving a book wit title : {title}", title);
             Book temp = bookRepo.GetByName(title);
             if (temp != null)
             {
-                if(temp.isDeleted)
+                if (temp.isDeleted)
                 {
+                    _logger.LogWarning("Book with title : {title} Not found", title);
                     return "Book Not Found - Deleted\n";
                 }
                 else if (temp.Available > 0)
@@ -43,16 +48,22 @@ namespace SLibrary.Business.Managers
                         ReleaseDate = null
                     };
                     reservationRepo.Add(r);
+                    _logger.LogInformation("Book with title : {title} Reserved Successfully", title);
                     return "Book Reserved Successfully !!\n";
                 }
                 else
+                {
+                    _logger.LogWarning("Book with title : {title} Can Not be Reserved", title);
                     return "Book Can Not be Reserved\n";
+                }
             }
+            _logger.LogWarning("Book with title : {title} Not found", title);
             return "Book Not Found\n";
         }
 
         public string ReleaseBook(string title, string clientName)
         {
+            _logger.LogInformation("Releasing a book wit title : {title}", title);
             Book temp = bookRepo.GetByName(title);
             if (temp != null)
             {
@@ -61,21 +72,30 @@ namespace SLibrary.Business.Managers
                     Reservation res = reservationRepo.GetActiveReservation(title, clientName);
 
                     if (res == null)
+                    {
+                        _logger.LogWarning("Book with title : {title} has not active reservations", title);
                         return "No active reservation found !!\n";
+                    }
 
                     bookRepo.UpdateCounts(temp.ID, temp.Available + 1, temp.Reserved - 1);
 
                     res.ReleaseDate = DateTime.Now;
                     reservationRepo.Update(res);
+                    _logger.LogInformation("Book with title : {title} Rleased Successfully", title);
                     return "Book Released Successfully !!\n";
                 }
                 else
+                {
+                    _logger.LogWarning("Book with title : {title} Can Not be Released", title);
                     return "There is NO Book to Release\n";
+                }
             }
+            _logger.LogWarning("Book with title : {title} Not found", title);
             return "Book Not Found\n";
         }
         public List<Reservationdto> GetAllReservations()
         {
+            _logger.LogInformation("Retrieving reservations from the database.");
             return reservationRepo.GetReservations().Select(r => new Reservationdto
             {
                 ID = r.ID,
@@ -89,6 +109,7 @@ namespace SLibrary.Business.Managers
 
         public Reservationdto GetReservationById(int id)
         {
+            _logger.LogInformation("Retrieving reservation with id {id}",id);
             var res = reservationRepo.GetReservationById(id);
             var resdto = new Reservationdto
             {

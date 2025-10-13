@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using System.IO;
-using SLibrary.DataAccess;
 using Shared;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
+using Microsoft.Extensions.Logging;
 
 namespace SLibrary.Business.Managers
 {
@@ -15,15 +13,17 @@ namespace SLibrary.Business.Managers
     {
         IBookRepository bookRepo;
         IReservationRepository reservationRepo;
+        private readonly ILogger<BookManager> _logger;
 
-        public BookManager(IBookRepository repo , IReservationRepository Rrepo)
+        public BookManager(IBookRepository repo , IReservationRepository Rrepo, ILogger<BookManager> logger)
         {
             bookRepo = repo;
             reservationRepo = Rrepo;
+            _logger = logger;
         }
         public void Add(CreateBookdto b)
         {
-
+            _logger.LogInformation("Adding a book");
             Book book = new Book
             {
                 Title = b.Title,
@@ -32,6 +32,7 @@ namespace SLibrary.Business.Managers
                 Available = 1,
             };
             bookRepo.Add(book);
+            _logger.LogInformation("Book added to the repository");
         }
 
 
@@ -52,6 +53,7 @@ namespace SLibrary.Business.Managers
         }
         public List<Bookdto> GetAllBooks()
         {
+            _logger.LogInformation("Retrieving books from the database.");
             return bookRepo.GetBooks().Select(b => new Bookdto
             {
                 ID = b.ID,
@@ -64,19 +66,29 @@ namespace SLibrary.Business.Managers
 
         public string Delete(int id)
         {
+            _logger.LogInformation("Deleting a book with id {id}", id);
             var book = bookRepo.GetById(id);
             if (book == null)
+            {
+                _logger.LogWarning("Book not found");
                 return "Book not found";
+            }
 
             var hasReservation = reservationRepo.GetReservations().Any(r => r.BookID == id && r.ReleaseDate ==null);
 
             if (hasReservation)
+            {
+                _logger.LogWarning("Book has active reservations");
                 return "Book cannot be deleted — it has reservations.";
+            }
 
             var success = bookRepo.Delete(id);
             if (success)
+            {
+                _logger.LogInformation("Book deleted successfully");
                 return "Book deleted successfully";
-
+            }
+            _logger.LogWarning("Failed to delete book");
             return "Failed to delete book";
 
         }
