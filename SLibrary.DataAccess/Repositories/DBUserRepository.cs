@@ -6,57 +6,90 @@ using System;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Shared;
 using System.Text;
+using Microsoft.Extensions.Logging;
+using Azure.Core;
 
 namespace SLibrary.DataAccess.Repositories
 {
     public class DBUserRepository : IUserRepository
     {
         private readonly SLibararyDBContext _db;
+        private readonly ILogger<DBUserRepository> _logger;
 
-        public DBUserRepository(SLibararyDBContext db)
+        public DBUserRepository(SLibararyDBContext db, ILogger<DBUserRepository> logger)
         {
             _db = db;
+            _logger = logger;
         }
 
         public List<User> GetUsers()
         {
-            List<User> users = _db.Users.ToList();
-            return users;
+            _logger.LogInformation("Retrieving users from the database.");
+          
+             List<User> users = _db.Users.ToList();
+             _logger.LogInformation("Successfully retrieved {UserCount} users.", users.Count);
+             return users;
+  
         }
 
         public void Add(User user)
         {
+            _logger.LogInformation("Adding user to the Database");
+
             var exist = _db.Users.FirstOrDefault(x => x.Id == user.Id);
-            if(exist != null)
+            if (exist != null)
+            {
+                _logger.LogWarning("User with {UserId} already exist.", user.Id);
                 throw new Exception("Username already exists.");
+            }
             else
             {
                 _db.Users.Add(user);
+                _db.SaveChanges();
+                _logger.LogInformation("User with ID {UserId} added successfully.", user.Id);
             }
-            _db.SaveChanges();
+            
         }
 
         public User GetByUsername(string name)
         {
+            _logger.LogInformation("Retriving a user by username: {Username}.", name);
+
             var user = _db.Users.FirstOrDefault(x => x.Username == name);
+            if(user != null)
+            {
+                _logger.LogInformation("User with username : {Username} found.",name);
+            }
+            else
+            {
+                _logger.LogWarning("No user Found");
+            }
             return user;
         }
 
 
         public bool Delete(string username)
         {
-            var user = _db.Users.FirstOrDefault(x => x.Username == username);
+            _logger.LogInformation("Deleting a user.");
 
-            if (user == null)
-                return false;
 
-            _db.Users.Remove(user);
-            _db.SaveChanges();
-            return true;
+             var user = _db.Users.FirstOrDefault(x => x.Username == username);
+
+             if (user == null)
+             {
+                 _logger.LogWarning("No user Found with username : {Username}.",username);
+                 return false;
+             }
+
+             _db.Users.Remove(user);
+             _db.SaveChanges();
+             _logger.LogInformation("User with username : {Username} deleted successfully.", user.Username);
+             return true;
         }
 
         private string HashPassword(string pass, string id)
         {
+            _logger.LogDebug("Hashing password for user ID {UserId}.", id);
             byte[] userid = Encoding.UTF8.GetBytes(id);
 
             byte[] hashed = KeyDerivation.Pbkdf2(
@@ -71,13 +104,17 @@ namespace SLibrary.DataAccess.Repositories
 
         public bool VerifyPassword(string pass, string id, string storedhash)
         {
+            _logger.LogDebug("Verifying password for user ID {UserId}.", id);
+
             byte[] userid = Encoding.UTF8.GetBytes(id);
 
             var hashed = HashPassword(pass, id);
 
-            if (hashed == storedhash)
-                return true;
-            return false;
+            bool result = (hashed == storedhash);
+
+
+            _logger.LogDebug("Verifying password for user ID {UserId} : {result}", id,result);
+            return result;
         }
     }
 }
