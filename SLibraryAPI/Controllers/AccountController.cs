@@ -10,6 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Linq;
 using Microsoft.AspNetCore.Authorization;
 using SLibrary.Business.Managers;
+using static System.Reflection.Metadata.BlobBuilder;
 
 namespace SLibraryAPI.Controllers
 {
@@ -19,10 +20,12 @@ namespace SLibraryAPI.Controllers
     {
         private readonly IUserManager  _userManager;
         private readonly IConfiguration configuration;
-        public AccountController(IUserManager userManager , IConfiguration config)
+        private readonly ILogger<AccountController> _logger;
+        public AccountController(IUserManager userManager , IConfiguration config, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             configuration = config;
+            _logger = logger;
         }
 
         /// <summary>
@@ -31,13 +34,17 @@ namespace SLibraryAPI.Controllers
         [HttpPost("Register")]
         public async Task<IActionResult> Create(dtoNewUser user)
         {
+            _logger.LogInformation("POST called to register a new user");
             var exist = _userManager.GetByUsername(user.Username);
             if (exist != null)
+            {
+                _logger.LogWarning("Failed - Username already exist");
                 return BadRequest("Username already exists.");
+            }
 
             _userManager.Add(user);
-
-            return Ok(new { message = "User registered successfully" });
+            _logger.LogInformation("User registered successfully");
+            return Ok("User registered successfully");
 
         }
 
@@ -48,10 +55,14 @@ namespace SLibraryAPI.Controllers
         [HttpPost("Login")]
         public async Task<IActionResult> LogIn(dtoLogin login)
         {
+            _logger.LogInformation("POST called to login");
             var isValid = _userManager.Validatelogin(login);
 
             if (!isValid)
+            {
+                _logger.LogWarning("login failed - Invalid username or password");
                 return Unauthorized("Invalid username or password");
+            }
 
             var u = _userManager.GetByUsername(login.Username);
 
@@ -94,7 +105,9 @@ namespace SLibraryAPI.Controllers
         [HttpGet]
         public async Task<IActionResult> Read()
         {
+            _logger.LogInformation("GET called to fetch all users");
             var users = _userManager.GetAllUsers();
+            _logger.LogInformation("Returned {Count} users.", users.Count);
             return Ok(users);
         }
 
@@ -106,16 +119,26 @@ namespace SLibraryAPI.Controllers
         [Authorize]
         public async Task<IActionResult> Delete(string username)
         {
+            _logger.LogInformation("DELETE called to delete a user ");
             var currentUser = HttpContext.User.Identity?.Name;
             var user = _userManager.GetByUsername(currentUser);
             if (user == null || user.Role != Role.Admin)
+            {
+                _logger.LogWarning("Delete failed - Only admins can delete user");
                 return StatusCode(403, "Only admins can delete users.");
+            }
 
             var result = _userManager.Delete(username);
-            if(result.Contains("successfully"))
+            if (result.Contains("successfully"))
+            {
+                _logger.LogInformation("User with Username: {username} deleted succssfully ", username);
                 return Ok(result);
+            }
             else
+            {
+                _logger.LogInformation("Deleting user with Username: {username} Failed ", username);
                 return BadRequest(result);
+            }
         }
 
 
