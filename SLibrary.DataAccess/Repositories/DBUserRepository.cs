@@ -44,6 +44,7 @@ namespace SLibrary.DataAccess.Repositories
             }
             else
             {
+                user.Password=HashPassword(user.Password, user.Id.ToString());
                 _db.Users.Add(user);
                 _db.SaveChanges();
                 _logger.LogInformation("User with ID {UserId} added successfully.", user.Id);
