@@ -28,7 +28,6 @@ namespace SLibrary.DataAccess.Repositories
         {
             _logger.LogInformation("Adding a reservation");
             _db.Reservations.Add(r);
-            _db.SaveChanges();
             _logger.LogInformation("Reservation added successfully");
         }
 
@@ -57,7 +56,6 @@ namespace SLibrary.DataAccess.Repositories
         {
             _logger.LogInformation("Updating a reservation");
             _db.Reservations.Update(r);
-            _db.SaveChanges();
             _logger.LogInformation("Reservation updated successfully");
         }
 

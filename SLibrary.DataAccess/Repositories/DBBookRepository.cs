@@ -45,8 +45,6 @@ namespace SLibrary.DataAccess.Repositories
                 };
                 _db.Books.Add(newbook);
             }
-
-            _db.SaveChanges();
             _logger.LogInformation("Book with title: {title} added successfully",book.Title);
         }
 
@@ -84,7 +82,6 @@ namespace SLibrary.DataAccess.Repositories
             {
                 book.Available = available;
                 book.Reserved = reserved;
-                _db.SaveChanges();
                 _logger.LogInformation("Book updated successfully");
             }
             _logger.LogWarning("Book not found");
@@ -102,7 +99,6 @@ namespace SLibrary.DataAccess.Repositories
             }
 
             book.isDeleted = true;
-            _db.SaveChanges();
             _logger.LogInformation("Book with id : {id} deleted succcessfully",id);
             return true;
         }

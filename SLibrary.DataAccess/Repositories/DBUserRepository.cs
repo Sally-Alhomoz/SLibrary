@@ -46,7 +46,6 @@ namespace SLibrary.DataAccess.Repositories
             {
                 user.Password=HashPassword(user.Password, user.Id.ToString());
                 _db.Users.Add(user);
-                _db.SaveChanges();
                 _logger.LogInformation("User with ID {UserId} added successfully.", user.Id);
             }
             
@@ -83,7 +82,6 @@ namespace SLibrary.DataAccess.Repositories
              }
 
              _db.Users.Remove(user);
-             _db.SaveChanges();
              _logger.LogInformation("User with username : {Username} deleted successfully.", user.Username);
              return true;
         }
