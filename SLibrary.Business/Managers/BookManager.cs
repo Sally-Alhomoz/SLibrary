@@ -6,19 +6,18 @@ using Shared;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
 using Microsoft.Extensions.Logging;
+using SLibrary.DataAccess.SUnitOfWork;
 
 namespace SLibrary.Business.Managers
 {
     public class BookManager : IBookManager
     {
-        IBookRepository bookRepo;
-        IReservationRepository reservationRepo;
+        private readonly IUnitOfWork _uow;
         private readonly ILogger<BookManager> _logger;
 
-        public BookManager(IBookRepository repo , IReservationRepository Rrepo, ILogger<BookManager> logger)
+        public BookManager(IUnitOfWork uow, ILogger<BookManager> logger)
         {
-            bookRepo = repo;
-            reservationRepo = Rrepo;
+            _uow = uow;
             _logger = logger;
         }
         public void Add(CreateBookdto b)
@@ -31,17 +30,18 @@ namespace SLibrary.Business.Managers
                 Reserved = 0,
                 Available = 1,
             };
-            bookRepo.Add(book);
+            _uow.DBBooks.Add(book);
+            _uow.Complete();
             _logger.LogInformation("Book added to the repository");
         }
 
 
         public override string ToString()
         {
-            if (bookRepo.BookCount() == 0)
+            if (_uow.DBBooks.BookCount() == 0)
                 return "No books available.";
 
-            List<Book> books = bookRepo.GetBooks();
+            List<Book> books = _uow.DBBooks.GetBooks();
 
             StringBuilder sb = new StringBuilder();
             foreach (Book b in books)
@@ -54,7 +54,7 @@ namespace SLibrary.Business.Managers
         public List<Bookdto> GetAllBooks()
         {
             _logger.LogInformation("Retrieving books from the database.");
-            return bookRepo.GetBooks().Select(b => new Bookdto
+            return _uow.DBBooks.GetBooks().Select(b => new Bookdto
             {
                 ID = b.ID,
                 Title = b.Title,
@@ -67,14 +67,14 @@ namespace SLibrary.Business.Managers
         public string Delete(int id)
         {
             _logger.LogInformation("Deleting a book with id {id}", id);
-            var book = bookRepo.GetById(id);
+            var book = _uow.DBBooks.GetById(id);
             if (book == null)
             {
                 _logger.LogWarning("Book not found");
                 return "Book not found";
             }
 
-            var hasReservation = reservationRepo.GetReservations().Any(r => r.BookID == id && r.ReleaseDate ==null);
+            var hasReservation = _uow.DBReservations.GetReservations().Any(r => r.BookID == id && r.ReleaseDate ==null);
 
             if (hasReservation)
             {
@@ -82,9 +82,10 @@ namespace SLibrary.Business.Managers
                 return "Book cannot be deleted — it has reservations.";
             }
 
-            var success = bookRepo.Delete(id);
+            var success = _uow.DBBooks.Delete(id);
             if (success)
             {
+                _uow.Complete();
                 _logger.LogInformation("Book deleted successfully");
                 return "Book deleted successfully";
             }

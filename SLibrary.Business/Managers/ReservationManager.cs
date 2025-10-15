@@ -8,26 +8,25 @@ using System.Linq;
 using System.Collections.Immutable;
 using SLibrary.Business.Interfaces;
 using Microsoft.Extensions.Logging;
+using SLibrary.DataAccess.SUnitOfWork;
 
 namespace SLibrary.Business.Managers
 {
     public class ReservationManager : IReservationManager
     {
-        IReservationRepository reservationRepo;
-        IBookRepository bookRepo;
+        private readonly IUnitOfWork _uow;
         private readonly ILogger<ReservationManager> _logger;
 
-        public ReservationManager(IReservationRepository Rrepo, IBookRepository Brepo, ILogger<ReservationManager> logger)
+        public ReservationManager(IUnitOfWork uow ,ILogger<ReservationManager> logger)
         {
-            reservationRepo = Rrepo;
-            bookRepo = Brepo;
+            _uow = uow;
             _logger = logger;
         }
 
         public string ReserveBook(string title, string clientName)
         {
             _logger.LogInformation("Reserving a book wit title : {title}", title);
-            Book temp = bookRepo.GetByName(title);
+            Book temp = _uow.DBBooks.GetByName(title);
             if (temp != null)
             {
                 if (temp.isDeleted)
@@ -37,7 +36,7 @@ namespace SLibrary.Business.Managers
                 }
                 else if (temp.Available > 0)
                 {
-                    bookRepo.UpdateCounts(temp.ID, temp.Available - 1, temp.Reserved + 1);
+                    _uow.DBBooks.UpdateCounts(temp.ID, temp.Available - 1, temp.Reserved + 1);
 
                     Reservation r = new Reservation
                     {
@@ -47,7 +46,8 @@ namespace SLibrary.Business.Managers
                         ReservedDate = DateTime.Now,
                         ReleaseDate = null
                     };
-                    reservationRepo.Add(r);
+                    _uow.DBReservations.Add(r);
+                    _uow.Complete();
                     _logger.LogInformation("Book with title : {title} Reserved Successfully", title);
                     return "Book Reserved Successfully !!\n";
                 }
@@ -64,12 +64,12 @@ namespace SLibrary.Business.Managers
         public string ReleaseBook(string title, string clientName)
         {
             _logger.LogInformation("Releasing a book wit title : {title}", title);
-            Book temp = bookRepo.GetByName(title);
+            Book temp = _uow.DBBooks.GetByName(title);
             if (temp != null)
             {
                 if (temp.Reserved > 0)
                 {
-                    Reservation res = reservationRepo.GetActiveReservation(title, clientName);
+                    Reservation res = _uow.DBReservations.GetActiveReservation(title, clientName);
 
                     if (res == null)
                     {
@@ -77,10 +77,11 @@ namespace SLibrary.Business.Managers
                         return "No active reservation found !!\n";
                     }
 
-                    bookRepo.UpdateCounts(temp.ID, temp.Available + 1, temp.Reserved - 1);
+                    _uow.DBBooks.UpdateCounts(temp.ID, temp.Available + 1, temp.Reserved - 1);
 
                     res.ReleaseDate = DateTime.Now;
-                    reservationRepo.Update(res);
+                    _uow.DBReservations.Update(res);
+                    _uow.Complete();
                     _logger.LogInformation("Book with title : {title} Rleased Successfully", title);
                     return "Book Released Successfully !!\n";
                 }
@@ -96,7 +97,7 @@ namespace SLibrary.Business.Managers
         public List<Reservationdto> GetAllReservations()
         {
             _logger.LogInformation("Retrieving reservations from the database.");
-            return reservationRepo.GetReservations().Select(r => new Reservationdto
+            return _uow.DBReservations.GetReservations().Select(r => new Reservationdto
             {
                 ID = r.ID,
                 ClientName = r.ClientName,
@@ -110,7 +111,7 @@ namespace SLibrary.Business.Managers
         public Reservationdto GetReservationById(int id)
         {
             _logger.LogInformation("Retrieving reservation with id {id}",id);
-            var res = reservationRepo.GetReservationById(id);
+            var res = _uow.DBReservations.GetReservationById(id);
             var resdto = new Reservationdto
             {
                 ID = res.ID,

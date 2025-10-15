@@ -6,19 +6,19 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
-using SLibrary.DataAccess.Repositories;
+using SLibrary.DataAccess.SUnitOfWork;
 
 
 namespace SLibrary.Business.Managers
 {
     public class UserManager : IUserManager
     {
-        IUserRepository userRepo;
+        private readonly IUnitOfWork _uow;
         private readonly ILogger<UserManager> _logger;
 
-        public UserManager(IUserRepository repo, ILogger<UserManager> logger)
+        public UserManager(IUnitOfWork uow, ILogger<UserManager> logger)
         {
-            userRepo = repo;
+            _uow = uow;
             _logger = logger;
         }
 
@@ -35,15 +35,16 @@ namespace SLibrary.Business.Managers
                 Role = Role.User,
                 Checksum = ""
             };
-            userRepo.Add(user);
+            _uow.DBUsers.Add(user);
             _logger.LogInformation("User added to the repository");
+            _uow.Complete();
         }
 
         public bool Validatelogin(dtoLogin user)
         {
             _logger.LogInformation("Validating login for username: {Username}", user.Username);
 
-            var exist = userRepo.GetByUsername(user.Username);
+            var exist = _uow.DBUsers.GetByUsername(user.Username);
             if (exist == null)
             {
                 _logger.LogWarning("Login failed. Username not found: {Username}", user.Username);
@@ -67,7 +68,7 @@ namespace SLibrary.Business.Managers
         public Userdto GetByUsername(string name)
         {
            _logger.LogInformation("Retriving a user by username: {Username}.", name);
-            var exist = userRepo.GetByUsername(name);
+            var exist = _uow.DBUsers.GetByUsername(name);
 
             if(exist != null)
             {
@@ -88,9 +89,11 @@ namespace SLibrary.Business.Managers
         {
             _logger.LogInformation("Deleting a user.");
 
-            var flag = userRepo.Delete(username);
+            var flag = _uow.DBUsers.Delete(username);
+
             if (flag)
             {
+                _uow.Complete();
                 _logger.LogInformation("Deleting a user with username : {Username} successfully.", username);
                 return "User deleted successfully";
             }
@@ -102,7 +105,7 @@ namespace SLibrary.Business.Managers
         public List<Userdto> GetAllUsers()
         {
             _logger.LogInformation("Retrieving users from the database.");
-            return userRepo.GetUsers().Select(x => new Userdto
+            return _uow.DBUsers.GetUsers().Select(x => new Userdto
             {
                Id = x.Id,
                Username=x.Username,
@@ -115,7 +118,7 @@ namespace SLibrary.Business.Managers
         public bool VerifyPassword(string pass, string id ,string storedhash)
         {
             _logger.LogInformation("Verifying password for user ID {UserId}.", id);
-            var hashed = userRepo.VerifyPassword(pass, id, storedhash);
+            var hashed = _uow.DBUsers.VerifyPassword(pass, id, storedhash);
 
             if (hashed)
             {
