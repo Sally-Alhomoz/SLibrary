@@ -1,16 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using Microsoft.AspNetCore.Identity;
-using SLibraryAPI;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Repositories;
 using SLibrary.DataAccess;
-using SLibrary.DataAccess.Models;
 using SLibrary.Business.Interfaces;
 using SLibrary.Business.Managers;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using SLibrary.DataAccess.SUnitOfWork;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -34,9 +32,7 @@ else
     builder.Services.AddDbContext<SLibararyDBContext>(options =>
         options.UseSqlServer(builder.Configuration.GetConnectionString("connectionString")));
 
-    builder.Services.AddScoped<IBookRepository, DBBookRepository>();
-    builder.Services.AddScoped<IReservationRepository, DBReservationRepository>();
-    builder.Services.AddScoped<IUserRepository, DBUserRepository>();
+    builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 }
 
 builder.Services.AddControllers();
