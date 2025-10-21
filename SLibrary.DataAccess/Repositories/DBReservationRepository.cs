@@ -12,7 +12,6 @@ namespace SLibrary.DataAccess.Repositories
         private readonly SLibararyDBContext _db;
         private readonly ILogger<DBReservationRepository> _logger;
 
-
         public DBReservationRepository(SLibararyDBContext db, ILogger<DBReservationRepository> logger)
         {
             _db = db;

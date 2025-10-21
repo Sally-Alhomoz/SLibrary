@@ -13,7 +13,6 @@ namespace SLibrary.DataAccess.Repositories
     {
         private readonly SLibararyDBContext _db;
         private readonly ILogger<DBBookRepository> _logger;
-
         public DBBookRepository(SLibararyDBContext db, ILogger<DBBookRepository> logger)
         {
             _db = db;
