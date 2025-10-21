@@ -20,6 +20,7 @@ namespace SLibraryMVC.Controllers
             return View(reservations);
         }
 
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Release(string clientname , string title)

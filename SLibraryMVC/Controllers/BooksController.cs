@@ -77,6 +77,7 @@ namespace SLibraryMVC.Controllers
             return RedirectToAction("Index");
         }
 
+
         [HttpPost]
         public async Task<IActionResult> Reserve(string title)
         {
