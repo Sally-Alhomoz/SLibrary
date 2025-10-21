@@ -12,6 +12,7 @@ namespace SLibraryAPI.Controllers
     {
         private readonly IBookManager _bookManager;
         private readonly ILogger<BooksController> _logger;
+
         public BooksController(IBookManager bookMng , ILogger<BooksController> logger)
         {
             _bookManager = bookMng;

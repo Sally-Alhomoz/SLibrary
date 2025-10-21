@@ -12,6 +12,7 @@ namespace SLibraryAPI.Controllers
         private readonly IReservationManager _reservationMng;
         private readonly ILogger<ReservationsController> _logger;
 
+
         public ReservationsController(IReservationManager reservationMng, ILogger<ReservationsController> logger)
         {
             _reservationMng = reservationMng;
