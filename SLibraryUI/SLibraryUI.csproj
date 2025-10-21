@@ -10,6 +10,7 @@
     <None Update="appsettings.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.20" />
     <PackageReference Include="Microsoft.Bcl.AsyncInterfaces" Version="9.0.9" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.20" />
@@ -26,6 +27,7 @@
     <PackageReference Include="Microsoft.Extensions.FileProviders.Abstractions" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.FileProviders.Physical" Version="9.0.9" />
     <PackageReference Include="Microsoft.Extensions.FileSystemGlobbing" Version="9.0.9" />
+    <PackageReference Include="Microsoft.Extensions.Logging" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Primitives" Version="9.0.9" />
     <PackageReference Include="Microsoft.VisualBasic" Version="10.3.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />

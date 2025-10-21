@@ -21,7 +21,7 @@ namespace SLibrary.DataAccess.Repositories
 
         public List<Book> Load()
         {
-            List<Book> books = _db.Books.ToList();
+            List<Book> books = _db.Books.Where(x => x.isDeleted == false).ToList();
             return books;
         }
         public void Add(Book b)
@@ -32,7 +32,7 @@ namespace SLibrary.DataAccess.Repositories
             if (book != null)
             {
                 book.Available = book.Available + 1;
-
+                _logger.LogInformation("Book with title: {title} already exists, increased availability", book.Title);
             }
             else
             {
@@ -44,8 +44,8 @@ namespace SLibrary.DataAccess.Repositories
                     Reserved = 0,
                 };
                 _db.Books.Add(newbook);
+                _logger.LogInformation("Book with title: {title} added successfully", newbook.Title);
             }
-            _logger.LogInformation("Book with title: {title} added successfully",book.Title);
         }
 
         public Book GetByName(string title)
@@ -68,7 +68,7 @@ namespace SLibrary.DataAccess.Repositories
         public List<Book> GetBooks()
         {
             _logger.LogInformation("Retrieving books from the database.");
-            List<Book> books = _db.Books.ToList();
+            List<Book> books = _db.Books.Where(x => x.isDeleted == false).ToList();
             return books;
         }
 

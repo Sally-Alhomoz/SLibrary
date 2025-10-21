@@ -76,8 +76,6 @@ namespace SLibraryAPI.Controllers
                 _logger.LogWarning("Failed - {result}", result);
                 return BadRequest("Book Can Not be reserved");
             }
-
-
         }
 
         /// <summary>

@@ -1,0 +1,89 @@
+﻿@{
+    ViewData["Title"] = "Books List";
+}
+@model IEnumerable<Shared.Bookdto>
+
+<div class="text-dark">
+    <h1 class="display-4">Books List</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (User.IsInRole("Admin") || User.IsInRole("Auditor"))
+    {
+        <p>
+            <a asp-action="Create" class="btn btn-primary">Add New Book</a>
+        </p>
+    }
+
+
+    <br />
+
+
+    <table class="table" >
+        <thead class="text-center">
+            <tr>
+                <th>Id</th>
+                <th>Title</th>
+                <th>Author</th>
+                <th>Reserved </th>
+                <th>Available</th>
+                @if (User.IsInRole("Admin"))
+                {
+                    <th>Delete</th>
+                }
+                <th>Reserve</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @if (Model != null && Model.Any())
+            {
+                foreach (var book in Model)
+                {
+                    <tr>
+                    <td>@book.ID</td>
+                        <td>@book.Title</td>
+                        <td>@book.Author</td>
+                        <td>@book.Reserved</td>
+                        <td>@book.Available</td>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Auditor"))
+                        {
+                            <td>
+                                <form asp-controller="Books" asp-action="Delete" asp-route-id="@book.ID" method="post"
+                                      onsubmit="return confirm('Are you sure you want to delete the book: @book.Title?');">
+
+                                    <button type="submit" class="btn btn-link text-danger p-0" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        }
+                        <td>
+                            <form asp-action="Reserve"  asp-route-title="@book.Title" method="post" onsubmit="return confirm('Reserve the book: @book.Title?');">
+
+                            <button type="submit" class="btn btn-link text-success p-0" title="Reserve Book">
+                             <i class="bi bi-bookmark-plus-fill"></i>
+                            </button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            }
+            else
+            {
+                <tr>
+                    <td colspan="5" class="text-center text-muted">No books found</td>
+                </tr>
+            }
+        </tbody>
+
+    </table>
+</div>
+
+

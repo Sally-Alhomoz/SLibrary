@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Reservations List";
+}
+
+@model List<Shared.Reservationdto>
+
+<div class="text">
+    <h1 class="display-4">Reservations</h1>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+
+    <br/>
+
+    <table class="table">
+        <thead class="text-center">
+            <tr>
+                <th>Id</th>
+                <th>Client Name</th>
+                <th>Book Title</th>
+                <th>Reserve Date</th>
+                <th>Release Date</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @foreach(var r in Model)
+            {
+                <tr>
+                    <td>@r.ID</td>
+                    <td>@r.ClientName</td>
+                    <td>@r.BookTitle</td>
+                    <td>@r.ReservedDate</td>
+                    <td>
+                        @if(r.ReleaseDate.HasValue)
+                        {
+                            @r.ReleaseDate
+                        }
+                        else
+                        {
+                           <form asp-controller="Reservation" asp-action="Release" method="post" onsubmit="return confirm('Release book : @r.BookTitle ?')">
+
+                                @Html.AntiForgeryToken()
+
+                                <input type="hidden" name="clientname" value="@r.ClientName" />
+                               <input type="hidden" name="title" value="@r.BookTitle" />
+                             
+                               <button type="submit" class="btn btn-link text-danger p-0" title="Release Book">
+                                    <i class="fas fa-arrow-alt-circle-up"></i> Release
+                               </button>
+                           </form>
+                        }
+
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

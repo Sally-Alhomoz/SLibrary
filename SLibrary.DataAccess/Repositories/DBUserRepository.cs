@@ -39,7 +39,7 @@ namespace SLibrary.DataAccess.Repositories
             var exist = _db.Users.FirstOrDefault(x => x.Id == user.Id);
             if (exist != null)
             {
-                _logger.LogWarning("User with {UserId} already exist.", user.Id);
+                _logger.LogWarning("User with Username already exist.", user.Username);
                 throw new Exception("Username already exists.");
             }
             else
