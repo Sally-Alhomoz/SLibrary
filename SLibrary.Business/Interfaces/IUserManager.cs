@@ -16,5 +16,6 @@ namespace SLibrary.Business.Interfaces
         string Delete(string username);
         List<Userdto> GetAllUsers();
         bool VerifyPassword(string pass, string id, string storedhash);
+        public bool SetUserInActive(string username);
     }
 }

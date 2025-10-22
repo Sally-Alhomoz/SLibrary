@@ -33,7 +33,8 @@ namespace SLibrary.Business.Managers
                 Email = u.Email,
                 Password = u.Password,
                 Role = Role.User,
-                Checksum = ""
+                Checksum = "",
+                IsActive=false
             };
             _uow.DBUsers.Add(user);
             _logger.LogInformation("User added to the repository");
@@ -54,14 +55,16 @@ namespace SLibrary.Business.Managers
             bool flag = VerifyPassword(user.password, exist.Id.ToString(), exist.Password);
             if(flag)
             {
+                exist.IsActive = true;
+                _uow.DBUsers.UpdateStatus(exist);
                 _logger.LogInformation("Login successful for username: {Username}", user.Username);
             }
             else 
             {
                 _logger.LogWarning("Login failed for username: {Username}", user.Username);
             }
+            _uow.Complete();
             return flag;
-        
            
         }
 
@@ -109,7 +112,8 @@ namespace SLibrary.Business.Managers
             {
                Id = x.Id,
                Username=x.Username,
-               Role=x.Role
+               Role=x.Role,
+               IsActive=x.IsActive
             }).ToList();
         }
 
@@ -129,6 +133,26 @@ namespace SLibrary.Business.Managers
             return false;
         }
 
+        public bool SetUserInActive(string username)
+        {
+            _logger.LogInformation("Setting active status for user {Username} to false", username);
+
+            var user = _uow.DBUsers.GetByUsername(username);
+
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {Username}", username);
+                return false;
+            }
+
+            user.IsActive = false;
+            _uow.DBUsers.UpdateStatus(user);
+            _uow.Complete();
+
+            _logger.LogInformation("User status updated successfully for {Username}", username);
+            return true;
+
+        }
 
     }
 }
