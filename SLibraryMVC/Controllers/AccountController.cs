@@ -43,6 +43,31 @@ namespace SLibraryMVC.Controllers
             }
         }
 
+        public IActionResult CreateUser()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> CreateUser(dtoNewUser model)
+        {
+            if (!ModelState.IsValid)
+                return View(model);
+
+            var response = await _client.PostAsJsonAsync("api/Account/Register", model);
+
+            if (response.IsSuccessStatusCode)
+            {
+                TempData["Success"] = "User added successfully";
+                return RedirectToAction("UsersList");
+            }
+            else
+            {
+                ViewBag.Error = await response.Content.ReadAsStringAsync();
+                return View(model);
+            }
+        }
+
 
         public IActionResult Login()
         {
@@ -81,8 +106,20 @@ namespace SLibraryMVC.Controllers
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
             HttpContext.Session.Remove("JWToken");
+
+            var username = User.Identity.Name;
+
+
+            if (!string.IsNullOrEmpty(username))
+            {
+                var endpoint = $"api/Account/SetInActive/{Uri.EscapeDataString(username)}";
+
+                var response = await _client.PatchAsync(endpoint, new StringContent(""));
+            }
+
             return RedirectToAction("Login");
         }
+
 
         [Authorize] 
         public async Task<IActionResult> UsersList()
@@ -142,7 +179,6 @@ namespace SLibraryMVC.Controllers
             var handler = new JwtSecurityTokenHandler();
             var token = handler.ReadJwtToken(jwtToken);
 
-            // Use claims (Name, Role, NameIdentifier) from the JWT
             var claims = token.Claims;
 
             var claimsIdentity = new ClaimsIdentity(
@@ -160,6 +196,7 @@ namespace SLibraryMVC.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
         }
+
     }
 
     public class LoginResponse
