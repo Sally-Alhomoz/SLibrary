@@ -70,7 +70,8 @@ namespace SLibraryAPI.Controllers
             {
                 Id = u.Id,
                 Username = u.Username,
-                Role = u.Role
+                Role = u.Role,
+                IsActive = true
             };
 
             var claims = new List<Claim>
@@ -138,6 +139,28 @@ namespace SLibraryAPI.Controllers
             {
                 _logger.LogInformation("Deleting user with Username: {username} Failed ", username);
                 return BadRequest(result);
+            }
+        }
+
+        /// <summary>
+        /// Sets a user's status to inactive (called upon client logout).
+        /// </summary>
+        [HttpPatch("SetInActive/{username}")]
+        public IActionResult SetInActive(string username)
+        {
+            _logger.LogInformation("PATCH called to set user {Username} to inactive.", username);
+
+            var success = _userManager.SetUserInActive(username);
+
+            if (success)
+            {
+                _logger.LogInformation("User {Username} successfully set to inactive.", username);
+                return NoContent(); 
+            }
+            else
+            {
+                _logger.LogWarning("Failed to set user {Username} to inactive.", username);
+                return StatusCode(500, "Failed to update user status.");
             }
         }
 
