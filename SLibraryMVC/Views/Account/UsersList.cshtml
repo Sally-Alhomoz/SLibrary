@@ -3,30 +3,47 @@
 <div class="text">
     <h1 class="display-4">Users</h1>
 
+    <p>
+        <a asp-action="CreateUser" class="btn btn-primary">Add New User</a>
+    </p>
+
 <table class="table">
-    <tr>
-        <th>Id</th>
-        <th>Username</th>
-        <th>Role</th>
-        <th>Delete</th>
-    </tr>
-    @foreach (var user in Model)
-    {
-        <tr>
-            <td>@user.Id</td>
-            <td>@user.Username</td>
-            <td>@user.Role</td>
-            <td>
-                <form asp-action="Delete" method ="post"
-                   onsubmit="return confirm('Are you sure you want to delete the user: @user.Username?');">
+        <thead class="text-center">
+            <tr>
+                <th>Status</th>
+                <th>Username</th>
+                <th>Role</th>
+                <th>Delete</th>
+            </tr>
+        </thead>
+        <tbody class="text-center">
+            @foreach (var user in Model)
+            {
+                <tr>
+                    <td>
+                        @if (user.IsActive)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td>@user.Username</td>
+                    <td>@user.Role</td>
+                    <td>
+                        <form asp-action="Delete" method ="post"
+                        onsubmit="return confirm('Are you sure you want to delete the user: @user.Username?');">
 
                         <input type="hidden" name="username" value="@user.Username" />
 
-                    <button type="submit" class="btn btn-link text-danger p-0" title="Delete">
-                        <i class="bi bi-trash"></i>
-                    </button>
-                </form>
-            </td>
-        </tr>
-    }
+                        <button type="submit" class="btn btn-link text-danger p-0" title="Delete">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
 </table>
