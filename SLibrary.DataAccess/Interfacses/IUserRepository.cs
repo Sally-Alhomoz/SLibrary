@@ -11,5 +11,6 @@ namespace SLibrary.DataAccess.Interfacses
 
         bool Delete(string username);
         bool VerifyPassword(string pass, string id, string storedhash);
+        void UpdateStatus(User user);
     }
 }

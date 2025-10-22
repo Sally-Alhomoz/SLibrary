@@ -8,6 +8,7 @@ using Shared;
 using System.Text;
 using Microsoft.Extensions.Logging;
 using Azure.Core;
+using Microsoft.EntityFrameworkCore;
 
 namespace SLibrary.DataAccess.Repositories
 {
@@ -114,6 +115,15 @@ namespace SLibrary.DataAccess.Repositories
 
             _logger.LogDebug("Verifying password for user ID {UserId} : {result}", id,result);
             return result;
+        }
+
+        public void UpdateStatus(User user)
+        {
+            var existingUser = _db.Users.FirstOrDefault(u => u.Id == user.Id);
+            if (existingUser != null)
+            {
+                existingUser.IsActive = user.IsActive;
+            }
         }
     }
 }
