@@ -18,6 +18,7 @@ namespace SLibrary.DataAccess.Models
         public Role Role { get; set; }
         public string Checksum { get; set; }
 
+        public bool IsActive { get; set; }
     }
 
 }
