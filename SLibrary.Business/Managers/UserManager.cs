@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Extensions.Logging;
 using SLibrary.DataAccess.SUnitOfWork;
+using System.Globalization;
 
 
 namespace SLibrary.Business.Managers
@@ -151,8 +152,89 @@ namespace SLibrary.Business.Managers
 
             _logger.LogInformation("User status updated successfully for {Username}", username);
             return true;
-
         }
 
+        public bool ResetPassword(string username, string newpassword, string oldpassword)
+        {
+            _logger.LogInformation("Reset the password for user {Username}", username);
+
+            var user = _uow.DBUsers.GetByUsername(username);
+
+            if(user == null)
+            {
+                _logger.LogWarning("User not found: {Username}", username);
+                return false;
+            }
+
+            var result = ValidatePassword(username, oldpassword);
+
+            if (!result)
+            {
+                _logger.LogWarning("Incorrect old password for {Username}", username);
+                return false;
+            }
+
+            user.Password = newpassword;
+            _uow.DBUsers.RestPassword(user);
+            _uow.Complete();
+
+            _logger.LogInformation("Successfully reset the password for user {Username}", username);
+            return true;
+        }
+
+        public bool ValidatePassword(string username, string password)
+        {
+            var user = _uow.DBUsers.GetByUsername(username);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            return _uow.DBUsers.ValidatePassword(user, password);
+        }
+
+
+        public bool EditEmail(string username , string newemail)
+        {
+            var result = _uow.DBUsers.EmailExist(newemail);
+
+            if(result)
+            {
+                _logger.LogWarning("Email already exist");
+                return false;
+            }
+
+            var user = _uow.DBUsers.GetByUsername(username); // must return tracked EF entity
+            if (user == null)
+            {
+                _logger.LogWarning("User not found: {Username}", username);
+                return false;
+            }
+            user.Email = newemail;
+            _uow.DBUsers.EditEmail(user);
+            _uow.Complete();
+            _logger.LogInformation("Successfully edit the email for user {Username}", username);
+            return true;
+        }
+
+        public Userdto GetAccountInfo(string username)
+        {
+            var user = _uow.DBUsers.GetByUsername(username);
+
+            if(user != null)
+            {
+                Userdto dto = new Userdto
+                {
+                    Id= user.Id,
+                    IsActive=user.IsActive,
+                    Username = user.Username,
+                    Email= user.Email,
+                    Role= user.Role
+                };
+                return dto;
+            }
+            return null;
+        }
     }
 }

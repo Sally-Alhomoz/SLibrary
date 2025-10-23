@@ -1,4 +1,5 @@
 ﻿using Shared;
+using SLibrary.DataAccess.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -17,5 +18,9 @@ namespace SLibrary.Business.Interfaces
         List<Userdto> GetAllUsers();
         bool VerifyPassword(string pass, string id, string storedhash);
         public bool SetUserInActive(string username);
+        public bool ResetPassword(string username, string newpassword, string oldpassword);
+        public bool ValidatePassword(string username, string password);
+        public bool EditEmail(string username, string newemail);
+        public Userdto GetAccountInfo(string username);
     }
 }
