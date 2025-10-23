@@ -205,7 +205,7 @@ namespace SLibrary.Business.Managers
                 return false;
             }
 
-            var user = _uow.DBUsers.GetByUsername(username); // must return tracked EF entity
+            var user = _uow.DBUsers.GetByUsername(username);
             if (user == null)
             {
                 _logger.LogWarning("User not found: {Username}", username);
