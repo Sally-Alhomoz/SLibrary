@@ -218,7 +218,17 @@ namespace SLibraryMVC.Controllers
             }
 
             var user = await response.Content.ReadFromJsonAsync<Userdto>();
-            return View("EditAccount",user);
+
+            var model = new EditAccountdto
+            {
+                Id = user.Id,
+                Username = user.Username,
+                Email = user.Email,
+                Role = user.Role,
+                IsActive = user.IsActive
+            };
+
+            return View("EditAccount",model);
         }
 
         public IActionResult ResetPassword()
@@ -227,7 +237,7 @@ namespace SLibraryMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResetPassword(EditAccountdto model)
+        public async Task<IActionResult> ResetPassword(EditAccountdto.ResetPassword model)
         {
             if (!ModelState.IsValid) 
             {
@@ -235,7 +245,7 @@ namespace SLibraryMVC.Controllers
             }
 
 
-            if (model.ResetPassworddto.NewPassword != model.ResetPassworddto.ConfirmPassword)
+            if (model.NewPassword != model.ConfirmPassword)
             {
                 ModelState.AddModelError("ResetPassworddto.ConfirmPassword", "The new password and confirmation do not match.");
                 return View("EditAccount",model);
@@ -249,7 +259,7 @@ namespace SLibraryMVC.Controllers
                     new AuthenticationHeaderValue("Bearer", token);
             }
 
-            var response = await _client.PatchAsJsonAsync("api/Account", model.ResetPassworddto);
+            var response = await _client.PatchAsJsonAsync("api/Account", model);
 
             if (!response.IsSuccessStatusCode)
             {
@@ -264,7 +274,7 @@ namespace SLibraryMVC.Controllers
                 }
                 return View("EditAccount", model);
             }
-            Logout();
+            await Logout();
             return RedirectToAction("Login");
         }
 
@@ -274,7 +284,7 @@ namespace SLibraryMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditEmail(EditAccountdto model)
+        public async Task<IActionResult> EditEmail(EditAccountdto.EditEmail model)
         {
             if (!ModelState.IsValid)
             {
@@ -291,7 +301,7 @@ namespace SLibraryMVC.Controllers
 
             var request = new HttpRequestMessage(HttpMethod.Patch, "api/Account/EditEmail")
             {
-                Content = JsonContent.Create(model.EditEmaildto)
+                Content = JsonContent.Create(model)
             };
 
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -311,7 +321,7 @@ namespace SLibraryMVC.Controllers
                 }
                 return View("EditAccount", model);
             }
-            Logout();
+            await Logout();
             return RedirectToAction("Login");
         }
 
