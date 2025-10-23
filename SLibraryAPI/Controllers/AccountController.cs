@@ -143,7 +143,7 @@ namespace SLibraryAPI.Controllers
         }
 
         /// <summary>
-        /// Sets a user's status to inactive (called upon client logout).
+        /// Sets a user's status to inactive (when client logout).
         /// </summary>
         [HttpPatch("SetInActive/{username}")]
         public IActionResult SetInActive(string username)
@@ -162,6 +162,91 @@ namespace SLibraryAPI.Controllers
                 _logger.LogWarning("Failed to set user {Username} to inactive.", username);
                 return StatusCode(500, "Failed to update user status.");
             }
+        }
+
+        /// <summary>
+        /// Resets a user password
+        /// </summary>
+        [HttpPatch]
+        public IActionResult RestPassword([FromBody] EditAccountdto.ResetPassword dto)
+        {
+
+            var username = User.Identity.Name;
+
+            _logger.LogInformation("PATCH called to reset password for user {Username}", username);
+
+            var user = _userManager.GetByUsername(username);
+
+            if (user == null)
+            {
+                _logger.LogWarning("Password reset failed: user {Username} not found", username);
+                return NotFound("User not found.");
+            }
+
+            var result = _userManager.ValidatePassword(user.Username, dto.OldPassword);
+
+            if (!result)
+            {
+                _logger.LogWarning("Incorrect old password for user {Username}", username);
+                return BadRequest("Incorrect old password.");
+            }
+
+            _userManager.ResetPassword(user.Username, dto.NewPassword,dto.OldPassword);
+            _logger.LogInformation("Successfully reset password for user {Username}", username);
+            return Ok();
+        }
+
+        /// <summary>
+        /// Edit Email
+        /// </summary>
+        [HttpPatch("EditEmail")]
+        public IActionResult EditEmail([FromBody] EditAccountdto.EditEmail dto)
+        {
+
+            var username = User.Identity.Name;
+
+            _logger.LogInformation("PATCH called to edit email for user {Username}", username);
+
+            var user = _userManager.GetByUsername(username);
+
+            if (user == null)
+            {
+                _logger.LogWarning("Failed: user {Username} not found", username);
+                return NotFound("User not found.");
+            }
+
+            var result = _userManager.EditEmail(username, dto.newEmail);
+
+            if (!result)
+            {
+                _logger.LogWarning("Email already esixt");
+                return BadRequest("Email already esixt.");
+            }
+
+            _logger.LogInformation("Successfully edit email for user {Username}", username);
+            return Ok();
+        }
+
+        ///<summary>
+        ///Get users info.
+        ///</summary>
+        [HttpGet("GetAccountInfo")]
+        public async Task<IActionResult> GetAccountInfo()
+        {
+
+            var username = User.Identity.Name;
+            _logger.LogInformation("Get called to get account info for user {Username}", username);
+
+            var user = _userManager.GetAccountInfo(username);
+
+            if(user == null)
+            {
+                _logger.LogWarning("User Not Found");
+                return NotFound("User Not Found");
+            }
+
+            _logger.LogInformation("Successfully get info for user {Username}", username);
+            return Ok(user);
         }
 
 
