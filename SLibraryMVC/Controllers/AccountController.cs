@@ -5,7 +5,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using System.Net.Http.Headers;
 using System.Security.Claims;
 using System.IdentityModel.Tokens.Jwt;
-using Shared; 
+using Shared;
+using System.Net;
 
 namespace SLibraryMVC.Controllers
 {
@@ -145,15 +146,14 @@ namespace SLibraryMVC.Controllers
             return View(users);
         }
 
-
-
         [Authorize] 
         [HttpPost] 
         public async Task<IActionResult> Delete(string username)
         {
             var token = HttpContext.Session.GetString("JWToken");
 
-            if (string.IsNullOrEmpty(token)) return RedirectToAction("Logout");
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Logout");
 
             var request = new HttpRequestMessage(HttpMethod.Delete, $"api/Account?username={username}");
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
@@ -196,6 +196,125 @@ namespace SLibraryMVC.Controllers
                 new ClaimsPrincipal(claimsIdentity),
                 authProperties);
         }
+
+
+        public async Task<IActionResult> EditAccount()
+        {
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+                return RedirectToAction("Login", "Account");
+
+            _client.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+
+
+            var response = await _client.GetAsync($"api/Account/GetAccountInfo");
+
+            if(!response.IsSuccessStatusCode)
+            {
+                ViewBag.Error = "Could not load account information.";
+                return View(new Userdto());
+            }
+
+            var user = await response.Content.ReadFromJsonAsync<Userdto>();
+            return View("EditAccount",user);
+        }
+
+        public IActionResult ResetPassword()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ResetPassword(EditAccountdto model)
+        {
+            if (!ModelState.IsValid) 
+            {
+                return View("EditAccount", model);
+            }
+
+
+            if (model.ResetPassworddto.NewPassword != model.ResetPassworddto.ConfirmPassword)
+            {
+                ModelState.AddModelError("ResetPassworddto.ConfirmPassword", "The new password and confirmation do not match.");
+                return View("EditAccount",model);
+            }
+
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (!string.IsNullOrEmpty(token))
+            {
+                _client.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue("Bearer", token);
+            }
+
+            var response = await _client.PatchAsJsonAsync("api/Account", model.ResetPassworddto);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                if (errorMessage.Contains("Incorrect old password"))
+                {
+                    ModelState.AddModelError("ResetPassworddto.OldPassword", "The current password entered is incorrect.");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                }
+                return View("EditAccount", model);
+            }
+            Logout();
+            return RedirectToAction("Login");
+        }
+
+        public IActionResult EditEmail()
+        {
+            return View();
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EditEmail(EditAccountdto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View("EditAccount", model);
+            }
+
+            var token = HttpContext.Session.GetString("JWToken");
+
+            if (string.IsNullOrEmpty(token))
+            {
+                Logout();
+                return RedirectToAction("Login");
+            }
+
+            var request = new HttpRequestMessage(HttpMethod.Patch, "api/Account/EditEmail")
+            {
+                Content = JsonContent.Create(model.EditEmaildto)
+            };
+
+            request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+            var response = await _client.SendAsync(request);
+
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorMessage = await response.Content.ReadAsStringAsync();
+                if (errorMessage.Contains("Email already esixt"))
+                {
+                    ModelState.AddModelError("EditEmaildto.newEmail", "Email already esixt");
+                }
+                else
+                {
+                    ModelState.AddModelError(string.Empty, errorMessage);
+                }
+                return View("EditAccount", model);
+            }
+            Logout();
+            return RedirectToAction("Login");
+        }
+
 
     }
 
