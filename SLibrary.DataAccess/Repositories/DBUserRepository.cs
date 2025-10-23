@@ -119,11 +119,68 @@ namespace SLibrary.DataAccess.Repositories
 
         public void UpdateStatus(User user)
         {
+            _logger.LogInformation("Update status for user {Username}", user.Username);
+
             var existingUser = _db.Users.FirstOrDefault(u => u.Id == user.Id);
             if (existingUser != null)
             {
                 existingUser.IsActive = user.IsActive;
+                _logger.LogInformation("Successfully update status for user {Username}", user.Username);
             }
+            else
+            {
+                _logger.LogWarning("Failed to update status for user {Username}", user.Username);
+            }
+        }
+
+        public void RestPassword(User user)
+        {
+            _logger.LogInformation("Reset password for user {Username}", user.Username);
+
+            var existingUser = _db.Users.FirstOrDefault(u => u.Id == user.Id);
+
+            if(existingUser != null)
+            {
+                existingUser.Password = HashPassword(user.Password, user.Id.ToString());
+                _logger.LogInformation("Successfully reset password for user {Username}", user.Username);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to reset password for user {Username}", user.Username);
+            }
+        }
+
+        public bool ValidatePassword(User user, string password)
+        {
+            return user.Password == HashPassword(password, user.Id.ToString());
+        }
+
+        public void EditEmail(User user)
+        {
+            _logger.LogInformation("Edit Email for user {Username}", user.Username);
+
+            var existingUser = _db.Users.FirstOrDefault(u => u.Id == user.Id);
+
+            if (existingUser != null)
+            {
+                existingUser.Email = user.Email;
+                _logger.LogInformation("Successfully Edit Email for user {Username}", user.Username);
+            }
+            else
+            {
+                _logger.LogWarning("Failed to Edit Email for user {Username}", user.Username);
+            }
+
+        }
+
+        public bool EmailExist(string email)
+        {
+            var result = _db.Users.FirstOrDefault(u => u.Email == email);
+
+            if (result != null)
+                return true;
+
+            return false;
         }
     }
 }
