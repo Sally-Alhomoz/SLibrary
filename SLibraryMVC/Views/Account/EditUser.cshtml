@@ -1,7 +1,7 @@
 ﻿@model Shared.EditAccountdto.EditEmail
 
 @{
-    ViewData["Title"] = "Edit Email";
+    ViewData["Title"] = "Edit User";
 }
 
 
@@ -11,17 +11,17 @@
         <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
         <div class="card shadow-sm">
             <div class="card-body">
-                <h4 class="card-title mb-3">Edit Email</h4>
+                <h4 class="card-title mb-3">Edit User Information</h4>
              
-                <form asp-action="EditEmail" method="post">
+                <form asp-action="EditUser" method="post">
 
                     <div class="mb-3">
-                        <label asp-for="newEmail" class="form-label">New Email</label>
+                        <label asp-for="newEmail" class="form-label">Edit Email</label>
                         <input asp-for="newEmail" type="email" class="form-control" placeholder="Enter new email" required />
                         <span asp-validation-for="newEmail" class="text-danger"></span>
                     </div>
 
-                    <button type="submit" class="btn btn-primary w-100">Update Email</button>
+                    <button type="submit" class="btn btn-primary w-100">Update</button>
                 </form>
             </div>
         </div>

@@ -278,13 +278,13 @@ namespace SLibraryMVC.Controllers
             return RedirectToAction("Login");
         }
 
-        public IActionResult EditEmail()
+        public IActionResult EditUser()
         {
             return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditEmail(EditAccountdto.EditEmail model)
+        public async Task<IActionResult> EditUser(EditAccountdto.EditEmail model)
         {
             if (!ModelState.IsValid)
             {
