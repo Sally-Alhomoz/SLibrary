@@ -1,9 +1,15 @@
-﻿
+﻿using System;
 
 namespace Shared
 {
     public class EditAccountdto
     {
+        public Guid Id { get; set; }
+        public string Username { get; set; }
+        public string Email { get; set; }
+        public Role Role { get; set; }
+        public bool IsActive { get; set; }
+
         public class EditEmail
         {
             public string newEmail { get; set; }
