@@ -168,6 +168,7 @@ namespace SLibraryAPI.Controllers
         /// Resets a user password
         /// </summary>
         [HttpPatch]
+        [Authorize]
         public IActionResult RestPassword([FromBody] EditAccountdto.ResetPassword dto)
         {
 
@@ -200,6 +201,7 @@ namespace SLibraryAPI.Controllers
         /// Edit Email
         /// </summary>
         [HttpPatch("EditEmail")]
+        [Authorize]
         public IActionResult EditEmail([FromBody] EditAccountdto.EditEmail dto)
         {
 
@@ -231,6 +233,7 @@ namespace SLibraryAPI.Controllers
         ///Get users info.
         ///</summary>
         [HttpGet("GetAccountInfo")]
+        [Authorize]
         public async Task<IActionResult> GetAccountInfo()
         {
 
