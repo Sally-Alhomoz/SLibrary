@@ -13,5 +13,6 @@ namespace SLibrary.DataAccess.Models
         public string ReservedBy { set; get; }
         public DateTime ReservedDate { get; set; }
         public DateTime? ReleaseDate { get; set; }
+
     }
 }
