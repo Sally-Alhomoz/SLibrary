@@ -10,6 +10,7 @@ namespace SLibrary.DataAccess.Models
         public string BookTitle { set; get; }
         public int BookID { set; get; }
         public string ClientName { set; get; }
+        public string ReservedBy { set; get; }
         public DateTime ReservedDate { get; set; }
         public DateTime? ReleaseDate { get; set; }
     }
