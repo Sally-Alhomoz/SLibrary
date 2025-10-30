@@ -27,7 +27,51 @@
                 <input asp-for="Password" type="password" class="form-control" placeholder="Enter Password" required />
                 <span asp-validation-for="Password" class="text-danger"></span>
             </div>
-            <button type="submit" class="btn btn-primary">Add</button>
+            <button type="button" class="btn btn-primary action-button"
+                    data-action-type="Add" data-username="@Model.Username">Add</button>
         </form>
     </div>
+    <div class="modal fade" id="confirmation" tabindex="-1" aria-labelledby="confirmationLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title" id="confirmationLabel">Confirmation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage"></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmActionButton">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+
+@section Scripts
+{
+    <script>
+        var formToSubmit = null;
+        $('.action-button').on('click', function () {
+            formToSubmit = $(this).closest('form');
+
+            var actionType = $(this).data('action-type');
+            var username = formToSubmit.find('input[name="Username"]').val();
+            var msg = msg = `Are you sure you want to add user: <strong>${username}</strong> ?`;
+
+            $('#modalMessage').html(msg);
+
+            var myModal = new bootstrap.Modal(document.getElementById('confirmation'));
+            myModal.show();
+        });
+
+        $('#confirmActionButton').on('click', function () {
+            if (formToSubmit) {
+                formToSubmit.submit();
+            }
+        });
+    </script>
+}

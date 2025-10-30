@@ -26,19 +26,14 @@
     <br />
 
 
-    <table class="table" >
+    <table class="table" id="BooksTable" >
         <thead class="text-center">
             <tr>
-                <th>Id</th>
                 <th>Title</th>
                 <th>Author</th>
                 <th>Reserved </th>
                 <th>Available</th>
-                @if (User.IsInRole("Admin"))
-                {
-                    <th>Delete</th>
-                }
-                <th>Reserve</th>
+                <th></th>
             </tr>
         </thead>
         <tbody class="text-center">
@@ -47,31 +42,40 @@
                 foreach (var book in Model)
                 {
                     <tr>
-                    <td>@book.ID</td>
                         <td>@book.Title</td>
                         <td>@book.Author</td>
                         <td>@book.Reserved</td>
                         <td>@book.Available</td>
-                        @if (User.IsInRole("Admin") || User.IsInRole("Auditor"))
-                        {
-                            <td>
-                                <form asp-controller="Books" asp-action="Delete" asp-route-id="@book.ID" method="post"
-                                      onsubmit="return confirm('Are you sure you want to delete the book: @book.Title?');">
+                        <td class="d-flex justify-content-center gap-2">
+                            @if (User.IsInRole("Admin") || User.IsInRole("Auditor"))
+                            {
+                                <form asp-controller="Books" asp-action="Delete" asp-route-id="@book.ID" method="post">
 
-                                    <button type="submit" class="btn btn-link text-danger p-0" title="Delete">
+
+                                    <button type="button" class="btn btn-link text-danger p-0 action-button" title="Delete"
+                                            data-action-type="Delete"
+                                            data-book-title="@book.Title">
                                         <i class="bi bi-trash"></i>
                                     </button>
                                 </form>
-                            </td>
-                        }
-                        <td>
-                            <form asp-action="Reserve"  asp-route-title="@book.Title" method="post" onsubmit="return confirm('Reserve the book: @book.Title?');">
+                            }
+                            @if (book.Available > 0)
+                            {
+                                <form asp-action="Reserve" asp-route-title="@book.Title" method="post">
 
-                            <button type="submit" class="btn btn-link text-success p-0" title="Reserve Book">
-                             <i class="bi bi-bookmark-plus-fill"></i>
-                            </button>
-                            </form>
+                                    <button type="button" class="btn btn-link text-success p-0 action-button" title="Reserve Book"
+                                            data-action-type="Reserve"
+                                            data-book-title="@book.Title">
+                                        <i class="bi bi-bookmark-plus-fill"></i>
+                                    </button>
+                                </form>
+                            }
+                            @if (!User.IsInRole("Admin") && !User.IsInRole("Auditor") && book.Available ==0)
+                            {
+                                <span class="text-muted">-</span>
+                            }
                         </td>
+
                     </tr>
                 }
             }
@@ -82,8 +86,109 @@
                 </tr>
             }
         </tbody>
-
     </table>
+
+    <div class="modal fade" id="confirmationModal" tabindex="-1" aria-labelledby="confirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="confirmationModalLabel">Confirmation</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p id="modalMessage"></p>
+                </div>
+
+                <div class="mb-3" id="clientName" style="display:none">
+                    <label for="clientNameInput" class="form-label">Client Name:</label>
+                    <input type="text" class="form-control" id="clientNameInput" required>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmActionButton">Confirm</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.datatables.net/1.11.5/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+
+    <script>
+        $(document).ready(function () {
+            $('#BooksTable').DataTable({
+                "columnDefs": [
+                    { "orderable": false, "targets": 4 }
+                ]
+            })
+        });
+
+        var formToSubmit = null;
+
+        $('.action-button').on('click', function () {
+
+            $('#confirmActionButton').off('click');
+
+            formToSubmit = $(this).closest('form');
+
+            var actionType = $(this).data('action-type');
+            var bookTitle = $(this).data('book-title');
+            var msg = "";
+
+            $('#clientName').hide();
+            $('#clientNameInput').prop('required', false).val('');
+
+            if (actionType == 'Delete') {
+                msg = `Are you sure you want to delete the book: <strong>${bookTitle}</strong>?`;
+                $('#confirmationModal .modal-header').removeClass('bg-success').addClass('bg-danger');
+                $('#confirmActionButton').removeClass('btn-success').addClass('btn-danger').text('Delete');
+
+            } else if (actionType == 'Reserve') {
+                msg = `Please enter the client's name to reserve: <strong>${bookTitle}</strong>.`;
+                $('#clientName').show();
+                $('#clientNameInput').prop('required', true);
+                $('#confirmationModal .modal-header').removeClass('bg-danger').addClass('bg-success');
+                $('#confirmActionButton').removeClass('btn-danger').addClass('btn-success').text('Reserve');
+            }
+
+            $('#modalMessage').html(msg);
+
+            var myModal = new bootstrap.Modal(document.getElementById('confirmationModal'));
+            myModal.show();
+
+            $('#confirmActionButton').on('click', function () {
+
+                if (actionType == 'Reserve') {
+                    var clientName = $('#clientNameInput').val().trim();
+
+
+                    if (!clientName) {
+                        alert('Client Name is required for reservation.');
+                        return;
+                    }
+
+                    $('<input>')
+                        .attr({
+                            type: 'hidden',
+                            id: 'clientNameHidden',
+                            name: 'clientname',
+                            value: clientName
+                        })
+                        .appendTo(formToSubmit);
+                }
+
+                if (formToSubmit) {
+                    formToSubmit.submit();
+                }
+            });
+
+        });
+    </script>
+}
 
 
