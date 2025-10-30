@@ -79,10 +79,10 @@ namespace SLibraryMVC.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Reserve(string title)
+        public async Task<IActionResult> Reserve(string title , string clientname)
         {
             var token = HttpContext.Session.GetString("JWToken");
-            var clientname = User.Identity.Name;
+            //var clientname = User.Identity.Name;
 
             if (string.IsNullOrEmpty(token) || string.IsNullOrEmpty(clientname))
             {
