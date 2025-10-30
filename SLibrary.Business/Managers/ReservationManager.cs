@@ -23,7 +23,7 @@ namespace SLibrary.Business.Managers
             _logger = logger;
         }
 
-        public string ReserveBook(string title, string clientName)
+        public string ReserveBook(string title, string clientName , string username)
         {
             _logger.LogInformation("Reserving a book wit title : {title}", title);
             Book temp = _uow.DBBooks.GetByName(title);
@@ -40,6 +40,7 @@ namespace SLibrary.Business.Managers
 
                     Reservation r = new Reservation
                     {
+                        ReservedBy = username,
                         ClientName = clientName,
                         BookTitle = title,
                         BookID = temp.ID,
@@ -100,6 +101,7 @@ namespace SLibrary.Business.Managers
             return _uow.DBReservations.GetReservations().Select(r => new Reservationdto
             {
                 ID = r.ID,
+                ReservedBy=r.ReservedBy,
                 ClientName = r.ClientName,
                 BookID = r.BookID,
                 BookTitle = r.BookTitle,
@@ -115,6 +117,7 @@ namespace SLibrary.Business.Managers
             var resdto = new Reservationdto
             {
                 ID = res.ID,
+                ReservedBy=res.ReservedBy,
                 ClientName = res.ClientName,
                 BookID = res.BookID,
                 BookTitle = res.BookTitle,
