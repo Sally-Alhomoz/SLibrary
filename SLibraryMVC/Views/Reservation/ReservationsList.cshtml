@@ -28,6 +28,7 @@
                 <th>Book Title</th>
                 <th>Reserve Date</th>
                 <th>Release Date</th>
+                <th>Reservation Period</th>
             </tr>
         </thead>
         <tbody class="text-center">
@@ -35,7 +36,19 @@
             {
                 <tr>
                     <td>@r.ReservedBy</td>
-                    <td>@r.ClientName</td>
+                    <td>
+                        <div class="d-flex justify-content-center gap-2 align-items-center">
+
+                            <span>@r.ClientName</span>
+                            <a asp-controller="Reservation" asp-action="ClientInfo"
+                               asp-route-clientname="@r.ClientName"
+                               class="btn btn-link text-info p-0"
+                               title="View Client Details">
+                                <i class="bi bi-eye-fill"></i>
+                            </a>
+
+                        </div>
+                    </td>
                     <td>@r.BookTitle</td>
                     <td>@r.ReservedDate</td>
                     <td>
@@ -60,6 +73,26 @@
                            </form>
                         }
 
+                    </td>
+                    <td>
+                        @if (r.ReleaseDate.HasValue)
+                        {
+                            string days = @r.ReservationPeriod.Days > 0 ? $"{@r.ReservationPeriod.Days} dy" : "";
+                            string hours = @r.ReservationPeriod.Hours > 0 ? $"{@r.ReservationPeriod.Hours} hr" : "";
+                            string minutes = @r.ReservationPeriod.Minutes > 0 ? $"{@r.ReservationPeriod.Minutes} min" : "";
+
+                            string Period = string.Join(", ", new[] { days, hours, minutes }.Where(s => !string.IsNullOrEmpty(s)));
+
+                            if (string.IsNullOrEmpty(Period))
+                            {
+                                Period = $"{@r.ReservationPeriod.Seconds} sec";
+                            }
+                            <span class="text-dark">@Period</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-success">Ongoing</span>
+                        }
                     </td>
                 </tr>
             }
