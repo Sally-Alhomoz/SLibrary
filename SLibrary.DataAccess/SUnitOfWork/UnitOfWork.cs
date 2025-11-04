@@ -14,6 +14,7 @@ namespace SLibrary.DataAccess.SUnitOfWork
         public IBookRepository DBBooks{ get; private set; }
         public IReservationRepository DBReservations { get; private set; }
         public IUserRepository DBUsers { get; private set; }
+        public IClientRepository DBClients { get; private set; }
         public UnitOfWork(SLibararyDBContext db , ILoggerFactory logger)
         {
             _db = db;
@@ -22,11 +23,12 @@ namespace SLibrary.DataAccess.SUnitOfWork
             var bookLogger = _logger.CreateLogger<DBBookRepository>();
             var resLogger = _logger.CreateLogger<DBReservationRepository>();
             var userLogger = _logger.CreateLogger<DBUserRepository>();
+            var clientLogger = _logger.CreateLogger<DBClientRepository>();
 
             DBBooks = new DBBookRepository(_db,bookLogger);
             DBReservations = new DBReservationRepository(_db, resLogger);
             DBUsers = new DBUserRepository(_db, userLogger);
-
+            DBClients = new DBClientRepository(_db,clientLogger);
         }
 
         public int Complete()
