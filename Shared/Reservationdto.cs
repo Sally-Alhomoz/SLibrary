@@ -12,5 +12,17 @@ namespace Shared
         public DateTime ReservedDate { get; set; }
         public DateTime? ReleaseDate { get; set; }
 
+        public TimeSpan ReservationPeriod
+        {
+            get
+            {
+                if (ReleaseDate.HasValue)
+                {
+                    return ReleaseDate.Value.Subtract(ReservedDate);
+                }
+                return TimeSpan.Zero;
+            }
+        }
+
     }
 }
