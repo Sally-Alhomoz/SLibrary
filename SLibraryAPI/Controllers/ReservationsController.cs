@@ -2,6 +2,7 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using SLibrary.Business.Interfaces;
+using SLibrary.Business.Managers;
 
 namespace SLibraryAPI.Controllers
 {
@@ -55,13 +56,13 @@ namespace SLibraryAPI.Controllers
         /// Reserve a book from the library.
         /// </summary>
 
-        [Authorize]
+        //[Authorize]
         [HttpPost("Reserve")]
-        public async Task<IActionResult> Create(string title, string clientname)
+        public async Task<IActionResult> Create(string title, string clientname,string phoneNo , string address)
         {
             string username = User.Identity.Name;
             _logger.LogInformation("POST called to create new reservation");
-            var result = _reservationMng.ReserveBook(title, clientname,username);
+            var result = _reservationMng.ReserveBook(title, clientname,username,phoneNo,address);
 
             if (result.Contains("Successfully"))
             {
@@ -83,7 +84,7 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Release a book from the library.
         /// </summary>
-        [Authorize]
+        //[Authorize]
         [HttpDelete("Release")]
         public async Task<IActionResult> Delete(string title, string clientname)
         {

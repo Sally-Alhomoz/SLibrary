@@ -28,11 +28,11 @@ namespace SLibraryMVC.Controllers
             var token = HttpContext.Session.GetString("JWToken");
             _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            if(clientname != User.Identity.Name)
-            {
-                TempData["ErrorMessage"] = "Cant relase book";
-                return Redirect("ReservationsList");
-            }
+            //if(clientname != User.Identity.Name)
+            //{
+            //    TempData["ErrorMessage"] = "Cant relase book";
+            //    return Redirect("ReservationsList");
+            //}
 
             var endpoint = $"api/Reservations/Release?title={Uri.EscapeDataString(title)}&clientname={Uri.EscapeDataString(clientname)}";
 
@@ -50,6 +50,37 @@ namespace SLibraryMVC.Controllers
                 ModelState.AddModelError(string.Empty, $"Failed to release book: {response.StatusCode}. Details: {errormsg}");
             }
             return RedirectToAction("ReservationsList");
+        }
+
+        public async Task<IActionResult> ClientInfo(string clientName)
+        {
+            var token = HttpContext.Session.GetString("JWToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Authentication token missing. Please log in.";
+                return RedirectToAction("Login", "Account"); 
+            }
+
+            if (string.IsNullOrWhiteSpace(clientName))
+            {
+                TempData["ErrorMessage"] = "Client name not provided.";
+                return RedirectToAction("ReservationsList"); 
+            }
+
+            var endpoint = $"api/Clients/{Uri.EscapeDataString(clientName)}";
+
+            var client = await _client.GetFromJsonAsync<Clientdto>(endpoint);
+
+            if (client == null)
+            {
+                TempData["ErrorMessage"] = $"Client details for '{clientName}' not found.";
+                return RedirectToAction("ReservationsList", "Reservation");
+            }
+            return View(client);
         }
     }
 }

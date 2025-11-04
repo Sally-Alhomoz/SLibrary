@@ -9,6 +9,7 @@ using System.Collections.Immutable;
 using SLibrary.Business.Interfaces;
 using Microsoft.Extensions.Logging;
 using SLibrary.DataAccess.SUnitOfWork;
+using System.Runtime.CompilerServices;
 
 namespace SLibrary.Business.Managers
 {
@@ -23,10 +24,13 @@ namespace SLibrary.Business.Managers
             _logger = logger;
         }
 
-        public string ReserveBook(string title, string clientName , string username)
+        public string ReserveBook(string title, string clientName , string username , string phoneNo ,string address)
         {
             _logger.LogInformation("Reserving a book wit title : {title}", title);
             Book temp = _uow.DBBooks.GetByName(title);
+
+            var exist = _uow.DBClients.GetByPhoneNo(phoneNo);
+
             if (temp != null)
             {
                 if (temp.isDeleted)
@@ -36,17 +40,31 @@ namespace SLibrary.Business.Managers
                 }
                 else if (temp.Available > 0)
                 {
+                    if(exist == null)
+                    {
+                        exist = new Client
+                        {
+                            fullName = clientName,
+                            PhoneNo = phoneNo,
+                            Address = address 
+                        };
+                        _uow.DBClients.Add(exist);
+                        _uow.Complete();
+                    }
+
                     _uow.DBBooks.UpdateCounts(temp.ID, temp.Available - 1, temp.Reserved + 1);
 
                     Reservation r = new Reservation
                     {
                         ReservedBy = username,
-                        ClientName = clientName,
+                        ClientName = exist.fullName,
+                        ClientId= exist.Id,
                         BookTitle = title,
                         BookID = temp.ID,
                         ReservedDate = DateTime.Now,
                         ReleaseDate = null
                     };
+
                     _uow.DBReservations.Add(r);
                     _uow.Complete();
                     _logger.LogInformation("Book with title : {title} Reserved Successfully", title);
