@@ -1,0 +1,15 @@
+﻿@using MudBlazor
+
+<MudDialogTitle>Test Modal</MudDialogTitle>
+<MudDialogContent>Hello from modal!</MudDialogContent>
+
+<MudDialogActions>
+    <MudButton OnClick="Close" Color="Color.Primary">Close</MudButton>
+</MudDialogActions>
+
+@code {
+    [CascadingParameter] IMudDialogInstance Dialog { get; set; }
+
+    void Close() => Dialog.Close();
+    
+}
