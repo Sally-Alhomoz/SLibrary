@@ -1,7 +1,12 @@
-﻿@page "/bookslist"
-@using Shared;
+﻿@rendermode InteractiveServer
+
+@page "/bookslist"
+@* @using Blazored.Modal
+@using Blazored.Modal.Services *@
+@using Shared
 @using SLibraryBlazor.Services
-@inject IBookService bookService;
+@inject IBookService bookService
+@inject NavigationManager NavManager
 
 
 <PageTitle>Books List</PageTitle>
@@ -13,6 +18,7 @@
         <i class="bi bi-plus-circle"></i> Add New Book
     </a>
 </div>
+
 
 @if (books == null)
 {
@@ -65,8 +71,8 @@ else
     private string message = "";
     private string messageClass = "";
 
-    [Inject]
-    private IModalService Modal { get; set; } = default!;
+    // [Inject]
+    // private IModalService Modal { get; set; } = default;
 
     protected override async Task OnInitializedAsync()
     {
@@ -78,38 +84,58 @@ else
         await bookService.Delete(book.ID);
         books = await bookService.Read();
 
-        message = $"Successfully deleted book: {book.Title}";
-        messageClass = "alert alert-success";
+        // message = $"Successfully deleted book: {book.Title}";
+        // messageClass = "alert alert-success";
 
         StateHasChanged();
     }
 
+    //async Task ReserveBook(Bookdto book)
+    //{
+        // message = "";
+
+
+        // var parameters = new ModalParameters()
+        //     .Add(nameof(ReserveModal.BookTitle), book.Title);
+
+        // var modalReference = Modal.Show<ReserveModal>($"Reserve: {book.Title}", parameters);
+        // var modalResult = await modalReference.Result;
+
+        // if (!modalResult.Cancelled)
+        // {
+        //     books = await bookService.Read();
+
+        //     message = $"Successfully reserved book: {book.Title}.";
+        //     messageClass = "alert alert-success";
+        // }
+        // else
+        // {
+        //     message = $"Reservation for {book.Title} was cancelled.";
+        //     messageClass = "alert alert-info";
+        // }
+        // StateHasChanged();
+   // }
+
+    // [Inject] IDialogService DialogService { get; set; }
+
+    // void ShowTest()
+    // {
+    //     var options = new DialogOptions
+    //     {
+    //         CloseButton = true,
+    //         MaxWidth = MaxWidth.Small,
+    //         FullWidth = true
+    //     };
+
+    //     DialogService.Show<TestModal>("Test Modal", options);
+    // }
+
     async Task ReserveBook(Bookdto book)
     {
-        System.Diagnostics.Debug.WriteLine($"--- DEBUG: ReserveBook method fired for: {book.Title}");
 
-        message = "";
+        string title = Uri.EscapeDataString(book.Title);
 
-
-        var parameters = new ModalParameters()
-            .Add(nameof(ReserveModal.BookTitle), book.Title);
-
-        var modalReference = Modal.Show<ReserveModal>($"Reserve: {book.Title}", parameters);
-        var modalResult = await modalReference.Result;
-
-        if (!modalResult.Cancelled)
-        {
-            books = await bookService.Read();
-
-            message = $"Successfully reserved book: {book.Title}.";
-            messageClass = "alert alert-success";
-        }
-        else
-        {
-            message = $"Reservation for {book.Title} was cancelled.";
-            messageClass = "alert alert-info";
-        }
-        StateHasChanged();
+        NavManager.NavigateTo($"/reservebook?title={title}");
     }
 }
  
