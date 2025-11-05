@@ -1,7 +1,11 @@
-﻿@page "/reservationlist"
+﻿@rendermode InteractiveServer
+
+@page "/reservationlist"
 @using Shared;
 @using SLibraryBlazor.Services;
+@inject ISnackbar Snackbar
 @inject IReservationService ReservationService
+
 
 <PageTitle>Reservations List</PageTitle>
 
@@ -36,8 +40,7 @@
                         else
                         {
                             <button type="button" class="btn btn-link text-danger p-0 action-button" title="Release Book"
-                                    data-action-type="Release"
-                                    data-book-title="@res.BookTitle">
+                                    @onclick="() => ReleaseBook(res)">
                                 <i class="fas fa-arrow-alt-circle-up"></i> Release
                             </button>
                         }
@@ -75,5 +78,23 @@
     protected override async Task OnInitializedAsync()
     {
         reservations = await ReservationService.Read();
+    }
+
+    async Task ReleaseBook(Reservationdto reservation)
+    {
+
+        var (isSuccess, message) = await ReservationService.Release(reservation.ClientName, reservation.BookTitle);
+
+        if (isSuccess)
+        {
+            Snackbar.Add(message, Severity.Success);
+
+            reservations = await ReservationService.Read();
+            StateHasChanged();
+        }
+        else
+        {
+            Snackbar.Add(message, Severity.Error);
+        }
     }
 }

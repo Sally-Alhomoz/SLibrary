@@ -42,6 +42,7 @@ namespace SLibrary.DataAccess.Repositories
                     Author = b.Author,
                     Available = 1,
                     Reserved = 0,
+                    isDeleted= false,
                 };
                 _db.Books.Add(newbook);
                 _logger.LogInformation("Book with title: {title} added successfully", newbook.Title);

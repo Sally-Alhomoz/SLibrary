@@ -182,5 +182,14 @@ namespace SLibrary.DataAccess.Repositories
 
             return false;
         }
+
+        public void EditUsername(User user)
+        {
+            var existinguser = _db.Users.FirstOrDefault(u => u.Id == user.Id);
+            if(existinguser != null)
+            {
+                existinguser.Username = user.Username;
+            }
+        }
     }
 }

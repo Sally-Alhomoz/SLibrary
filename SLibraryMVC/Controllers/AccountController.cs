@@ -46,7 +46,8 @@ namespace SLibraryMVC.Controllers
 
         public IActionResult CreateUser()
         {
-            return View();
+            var model = new Shared.dtoNewUser();
+            return View(model);
         }
 
         [HttpPost]
@@ -237,7 +238,7 @@ namespace SLibraryMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> ResetPassword(EditAccountdto.ResetPassword model)
+        public async Task<IActionResult> ResetPassword(ResetPassworddto model)
         {
             if (!ModelState.IsValid) 
             {
@@ -247,8 +248,8 @@ namespace SLibraryMVC.Controllers
 
             if (model.NewPassword != model.ConfirmPassword)
             {
-                ModelState.AddModelError("ResetPassworddto.ConfirmPassword", "The new password and confirmation do not match.");
-                return View("EditAccount",model);
+                ModelState.AddModelError("ConfirmPassword", "The new password and confirmation do not match.");
+                return View("ResetPassword",model);
             }
 
             var token = HttpContext.Session.GetString("JWToken");
@@ -266,13 +267,13 @@ namespace SLibraryMVC.Controllers
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 if (errorMessage.Contains("Incorrect old password"))
                 {
-                    ModelState.AddModelError("ResetPassworddto.OldPassword", "The current password entered is incorrect.");
+                    ModelState.AddModelError("OldPassword", "The current password entered is incorrect.");
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, errorMessage);
                 }
-                return View("EditAccount", model);
+                return View("ResetPassword", model);
             }
             await Logout();
             return RedirectToAction("Login");
@@ -284,7 +285,7 @@ namespace SLibraryMVC.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> EditUser(EditAccountdto.EditEmail model)
+        public async Task<IActionResult> EditUser(EditAccountdto model)
         {
             if (!ModelState.IsValid)
             {
@@ -295,7 +296,7 @@ namespace SLibraryMVC.Controllers
 
             if (string.IsNullOrEmpty(token))
             {
-                Logout();
+                await Logout();
                 return RedirectToAction("Login");
             }
 
@@ -313,13 +314,13 @@ namespace SLibraryMVC.Controllers
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 if (errorMessage.Contains("Email already esixt"))
                 {
-                    ModelState.AddModelError("EditEmaildto.newEmail", "Email already esixt");
+                    ModelState.AddModelError("newEmail", "Email already esixt");
                 }
                 else
                 {
                     ModelState.AddModelError(string.Empty, errorMessage);
                 }
-                return View("EditAccount", model);
+                return View("EditUser", model);
             }
             await Logout();
             return RedirectToAction("Login");

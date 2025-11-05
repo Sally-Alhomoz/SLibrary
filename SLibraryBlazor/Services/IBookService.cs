@@ -7,6 +7,6 @@ namespace SLibraryBlazor.Services
         Task<List<Bookdto>> Read();
         Task Delete(int id);
         Task Create(Bookdto book);
-        Task Reserve(string title, string clientname, string phoneNo, string address);
+        Task<bool> Reserve(string title, string clientname, string phoneNo, string address);
     }
 }

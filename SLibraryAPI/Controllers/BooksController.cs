@@ -34,7 +34,7 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Add a book to the library.
         /// </summary>
-        [Authorize]
+        //[Authorize]
         [HttpPost]
         public async Task<IActionResult> Create(string name , string author)
         {
@@ -54,7 +54,7 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Delete a book to the library.
         /// </summary>
-        [Authorize]
+        //[Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {

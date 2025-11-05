@@ -18,5 +18,6 @@ namespace SLibrary.DataAccess.Interfacses
 
         public void EditEmail(User user);
         public bool EmailExist(string email);
+        public void EditUsername(User user);
     }
 }

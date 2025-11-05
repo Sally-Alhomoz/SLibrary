@@ -79,7 +79,7 @@ namespace SLibraryMVC.Controllers
 
 
         [HttpPost]
-        public async Task<IActionResult> Reserve(string title , string clientname)
+        public async Task<IActionResult> Reserve(string title , string clientname,string phoneNo , string address)
         {
             var token = HttpContext.Session.GetString("JWToken");
             //var clientname = User.Identity.Name;
@@ -90,7 +90,7 @@ namespace SLibraryMVC.Controllers
             }
 
 
-            var endpoint = $"api/Reservations/Reserve?title={Uri.EscapeDataString(title)}&clientname={Uri.EscapeDataString(clientname)}";
+            var endpoint = $"api/Reservations/Reserve?title={Uri.EscapeDataString(title)}&clientname={Uri.EscapeDataString(clientname)}&phoneNo={Uri.EscapeDataString(phoneNo)}&address={Uri.EscapeDataString(address)}";
 
             var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             request.Headers.Authorization = new AuthenticationHeaderValue("Bearer", token);

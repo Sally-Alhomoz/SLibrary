@@ -16,6 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddScoped<IBookManager, BookManager>();
 builder.Services.AddScoped<IReservationManager, ReservationManager>();
 builder.Services.AddScoped<IUserManager , UserManager>();
+builder.Services.AddScoped<IClientManager, ClientManager>();
 
 string mode = builder.Configuration["Storage:Mode"] ?? "Database";
 

@@ -42,12 +42,14 @@ namespace SLibraryBlazor.Services
             }
         }
 
-        public async Task Reserve(string title, string clientname, string phoneNo, string address)
+        public async Task<bool> Reserve(string title, string clientname, string phoneNo, string address)
         {
             var endpoint = $"api/Reservations/Reserve?title={Uri.EscapeDataString(title)}&clientname={Uri.EscapeDataString(clientname)}&phoneNo={Uri.EscapeDataString(phoneNo)}&address={Uri.EscapeDataString(address)}";
 
             var request = new HttpRequestMessage(HttpMethod.Post, endpoint);
             var response = await _client.SendAsync(request);
+
+            return response.IsSuccessStatusCode;
         }
     }
 }

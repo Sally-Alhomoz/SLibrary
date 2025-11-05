@@ -1,0 +1,38 @@
+﻿@rendermode InteractiveServer
+
+@page "/"
+@using MudBlazor
+@using SLibraryBlazor.Components.Pages.Book_Pages
+@using SLibraryBlazor.Services
+
+
+<PageTitle>Home</PageTitle>
+
+<h1>Hello, world!</h1>
+
+Welcome to your new app.
+<br /> <br />
+
+<button class="btn btn-primary" @onclick="ShowTest">Test Modal</button>
+
+
+@code{
+    [Inject] IDialogService DialogService { get; set; }
+
+    async Task  ShowTest()
+    {
+        var options = new DialogOptions
+        {
+            CloseButton = true,
+            MaxWidth = MaxWidth.ExtraExtraLarge,
+            FullWidth = true
+        };
+
+
+        Console.WriteLine("Show Test1: " + DialogService);
+
+        var dialog =  await DialogService.ShowAsync<TestModal>("Test Modal", options);
+        Console.WriteLine("Show Test2: " + dialog);
+
+    }
+}

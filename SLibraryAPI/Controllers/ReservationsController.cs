@@ -58,7 +58,7 @@ namespace SLibraryAPI.Controllers
 
         //[Authorize]
         [HttpPost("Reserve")]
-        public async Task<IActionResult> Create(string title, string clientname,string phoneNo , string address)
+        public async Task<IActionResult> Create([FromQuery] string title, [FromQuery] string clientname, [FromQuery] string phoneNo , [FromQuery] string address)
         {
             string username = User.Identity.Name;
             _logger.LogInformation("POST called to create new reservation");

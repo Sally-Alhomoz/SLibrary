@@ -169,7 +169,7 @@ namespace SLibraryAPI.Controllers
         /// </summary>
         [HttpPatch]
         [Authorize]
-        public IActionResult RestPassword([FromBody] EditAccountdto.ResetPassword dto)
+        public IActionResult RestPassword([FromBody] ResetPassworddto dto)
         {
 
             var username = User.Identity.Name;
@@ -202,7 +202,7 @@ namespace SLibraryAPI.Controllers
         /// </summary>
         [HttpPatch("EditEmail")]
         [Authorize]
-        public IActionResult EditEmail([FromBody] EditAccountdto.EditEmail dto)
+        public IActionResult EditEmail([FromBody] EditAccountdto dto)
         {
 
             var username = User.Identity.Name;
@@ -222,7 +222,7 @@ namespace SLibraryAPI.Controllers
             if (!result)
             {
                 _logger.LogWarning("Email already esixt");
-                return BadRequest("Email already esixt.");
+                return BadRequest("Email already esixt");
             }
 
             _logger.LogInformation("Successfully edit email for user {Username}", username);
