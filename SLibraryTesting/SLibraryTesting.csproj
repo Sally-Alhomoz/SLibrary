@@ -19,6 +19,7 @@
     <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
+	
   <ItemGroup>
     <ProjectReference Include="..\Shared\Shared.csproj" />
     <ProjectReference Include="..\SLibrary.Business\SLibrary.Business.csproj" />
