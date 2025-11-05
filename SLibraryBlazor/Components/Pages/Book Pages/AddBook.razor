@@ -1,10 +1,11 @@
 ﻿@page "/addbook"
 @using Shared
 @using SLibraryBlazor.Services
-@using Blazored.Modal.Services
 @inject IBookService bookService
 @inject NavigationManager NavManager
-@inject IModalService Modal
+@* @using Blazored.Modal
+@using Blazored.Modal.Services
+@inject IModalService Modal *@
 
 <PageTitle>Add Book</PageTitle>
 <h3 class="text-center">Add New Book</h3>
@@ -17,7 +18,7 @@
 <div class="row justify-content-center mt-5">
     <div class="col-md-6 col-lg-4">
 
-        <EditForm Model="@newBook" OnValidSubmit="@HandleConfirmation" FormName="AddBookForm">
+        <EditForm Model="@newBook" OnValidSubmit="@HandleValidSubmit" FormName="AddBookForm">
             <DataAnnotationsValidator />
 
             <div class="mb-3">
@@ -42,29 +43,38 @@
     private Bookdto newBook { get; set; } = new Bookdto();
     private string? ErrorMessage;
 
-    private async Task HandleConfirmation()
+
+    private async Task HandleValidSubmit()
     {
         ErrorMessage = null;
 
-        var parameters = new ModalParameters()
-            .Add(nameof(ConfirmDialog.Message), $"Are you sure you want to Add the book: {newBook.Title}?")
-            .Add(nameof(ConfirmDialog.Title), "Add Confirmation");
-
-        var modalReference = Modal.Show<ConfirmDialog>("Confirmation", parameters);
-        var modalResult = await modalReference.Result;
-
-        if (!modalResult.Cancelled)
-        {
-            try
-            {
-                await bookService.Create(newBook);
-                NavManager.NavigateTo("/bookslist");
-            }
-            catch (Exception ex)
-            {
-                ErrorMessage = $"Error adding book: {ex.Message}";
-                StateHasChanged();
-            }
-        }
+        await bookService.Create(newBook);
+        NavManager.NavigateTo("/bookslist");
     }
+
+    // private async Task HandleConfirmation()
+    // {
+    //     ErrorMessage = null;
+
+    //     var parameters = new ModalParameters()
+    //         .Add(nameof(ConfirmDialog.Message), $"Are you sure you want to Add the book: {newBook.Title}?")
+    //         .Add(nameof(ConfirmDialog.Title), "Add Confirmation");
+
+    //     var modalReference = Modal.Show<ConfirmDialog>("Confirmation", parameters);
+    //     var modalResult = await modalReference.Result;
+
+    //     if (!modalResult.Cancelled)
+    //     {
+    //         try
+    //         {
+    //             await bookService.Create(newBook);
+    //             NavManager.NavigateTo("/bookslist");
+    //         }
+    //         catch (Exception ex)
+    //         {
+    //             ErrorMessage = $"Error adding book: {ex.Message}";
+    //             StateHasChanged();
+    //         }
+    //     }
+    // }
 }
