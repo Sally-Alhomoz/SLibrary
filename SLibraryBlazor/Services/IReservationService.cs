@@ -7,4 +7,5 @@ namespace SLibraryBlazor.Services
         Task<List<Reservationdto>> Read();
          Task<(bool, string)> Release(string clientname, string title);
     }
+
 }
