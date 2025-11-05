@@ -9,4 +9,5 @@ namespace SLibraryBlazor.Services
         Task Create(Bookdto book);
         Task<bool> Reserve(string title, string clientname, string phoneNo, string address);
     }
+
 }

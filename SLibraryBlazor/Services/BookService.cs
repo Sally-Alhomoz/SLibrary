@@ -51,5 +51,6 @@ namespace SLibraryBlazor.Services
 
             return response.IsSuccessStatusCode;
         }
+
     }
 }
