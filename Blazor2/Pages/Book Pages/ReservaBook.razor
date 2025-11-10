@@ -1,0 +1,72 @@
+﻿@* @rendermode InteractiveServer *@
+
+@page "/reservebook"
+@using Shared
+@using Blazor2.Services
+@inject IBookService bookService
+@inject NavigationManager NavManager
+
+<PageTitle>Reserve Book</PageTitle>
+<h3 class="text-center">Reserve Book @BookTitle</h3>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+
+        <EditForm Model="@client" OnValidSubmit="@HandleValidSubmit" FormName="ReserveBookForm">
+            <DataAnnotationsValidator />
+
+            <div class="mb-3">
+                <label for="PhoneNo" class="form-label">Phone Number</label>
+                <InputText id="PhoneNo" @bind-Value="client.PhoneNo" class="form-control" placeholder="Enter phone number" required />
+                <ValidationMessage For="@(() => client.PhoneNo)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="fullName" class="form-label">Client Name</label>
+                <InputText id="fullName" @bind-Value="client.fullName" class="form-control" placeholder="Enter name" required />
+                <ValidationMessage For="@(() => client.fullName)" class="text-danger" />
+            </div>
+
+            <div class="mb-3">
+                <label for="Address" class="form-label">Address</label>
+                <InputText id="Address" @bind-Value="client.Address" class="form-control" placeholder="Enter address" required />
+                <ValidationMessage For="@(() => client.Address)" class="text-danger" />
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add</button>
+        </EditForm>
+    </div>
+</div>
+
+
+
+@code {
+    [SupplyParameterFromForm]
+    private Clientdto client { get; set; } = new Clientdto();
+
+    public string BookTitle { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (BookTitle == string.Empty)
+        {
+            var uri = NavManager.ToAbsoluteUri(NavManager.Uri);
+
+            if (Microsoft.AspNetCore.WebUtilities.QueryHelpers.ParseQuery(uri.Query).TryGetValue("title", out var titleValue))
+            {
+                BookTitle = titleValue.ToString();
+            }
+        }
+    }
+
+
+    private async Task HandleValidSubmit()
+    {
+        bool success = await bookService.Reserve(BookTitle, client.fullName, client.PhoneNo, client.Address);
+
+        if (success)
+        {
+            NavManager.NavigateTo("/bookslist");
+        }
+    }
+}
