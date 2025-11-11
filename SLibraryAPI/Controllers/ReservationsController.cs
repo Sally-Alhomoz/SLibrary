@@ -60,7 +60,7 @@ namespace SLibraryAPI.Controllers
         [HttpPost("Reserve")]
         public async Task<IActionResult> Create([FromQuery] string title, [FromQuery] string clientname, [FromQuery] string phoneNo , [FromQuery] string address)
         {
-            string username = User.Identity.Name;
+            string username = User.Identity!.Name!;
             _logger.LogInformation("POST called to create new reservation");
             var result = _reservationMng.ReserveBook(title, clientname,username,phoneNo,address);
 

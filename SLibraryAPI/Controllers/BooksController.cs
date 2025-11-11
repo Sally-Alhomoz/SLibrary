@@ -35,19 +35,34 @@ namespace SLibraryAPI.Controllers
         /// Add a book to the library.
         /// </summary>
         //[Authorize]
-        [HttpPost]
-        public async Task<IActionResult> Create(string name , string author)
-        {
-            _logger.LogInformation("POST called to add a new book with Title: {BookTitle}, Author: {BookAuthor}", name, author);
-            CreateBookdto dto = new CreateBookdto
-            {
-                Title = name,
-                Author= author
-            };
-            _bookManager.Add(dto);
-            _logger.LogInformation("Book '{BookTitle}' added successfully.", name);
-            return Ok("Book added successfully");
+        //[HttpPost]
+        //public async Task<IActionResult> Create(string name , string author)
+        //{
+        //    _logger.LogInformation("POST called to add a new book");
+        //    CreateBookdto dto = new CreateBookdto
+        //    {
+        //        Title = name,
+        //        Author= author
+        //    };
+        //    _bookManager.Add(dto);
+        //    _logger.LogInformation("Book '{BookTitle}' added successfully.", name);
+        //    return Ok("Book added successfully");
 
+        //}
+
+        /// <summary>
+        /// Add a book to the library.
+        /// </summary>
+        [HttpPost]
+        public async Task<IActionResult> Create([FromBody] CreateBookdto dto)
+        {
+            _logger.LogInformation("POST called to add a new book");
+
+
+            _bookManager.Add(dto);
+            _logger.LogInformation("Book '{BookTitle}' added successfully.", dto.Title);
+
+            return Ok("Book added successfully");
         }
 
 

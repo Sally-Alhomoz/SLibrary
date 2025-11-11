@@ -9,8 +9,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using SLibrary.DataAccess.SUnitOfWork;
+using Microsoft.AspNetCore.Cors;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 // Add services to the container.
 builder.Services.AddScoped<IBookManager, BookManager>();
@@ -87,7 +89,33 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowBlazorWasm",
+//        policy =>
+//        {
+//            policy.WithOrigins("https://localhost:7243") 
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials();
+//        });
+//});
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueDev",
+        policy =>
+        {
+            policy.WithOrigins("http://localhost:5173") 
+                  .AllowAnyHeader()
+                  .AllowAnyMethod()
+                  .AllowCredentials();
+        });
+});
+
+
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -97,6 +125,9 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+//app.UseCors("AllowBlazorWasm");
+app.UseCors("AllowVueDev");
+
 
 app.UseAuthorization();
 

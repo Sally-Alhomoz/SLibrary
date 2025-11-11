@@ -102,7 +102,7 @@ namespace SLibraryAPI.Controllers
         ///<summary>
         ///Get all users.
         ///</summary>
-        [Authorize]
+        //[Authorize]
         [HttpGet]
         public async Task<IActionResult> Read()
         {
@@ -117,7 +117,7 @@ namespace SLibraryAPI.Controllers
         /// </summary>
 
         [HttpDelete]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> Delete(string username)
         {
             _logger.LogInformation("DELETE called to delete a user ");
@@ -168,7 +168,7 @@ namespace SLibraryAPI.Controllers
         /// Resets a user password
         /// </summary>
         [HttpPatch]
-        [Authorize]
+        //[Authorize]
         public IActionResult RestPassword([FromBody] ResetPassworddto dto)
         {
 
@@ -201,7 +201,7 @@ namespace SLibraryAPI.Controllers
         /// Edit Email
         /// </summary>
         [HttpPatch("EditEmail")]
-        [Authorize]
+        //[Authorize]
         public IActionResult EditEmail([FromBody] EditAccountdto dto)
         {
 
@@ -233,7 +233,7 @@ namespace SLibraryAPI.Controllers
         ///Get users info.
         ///</summary>
         [HttpGet("GetAccountInfo")]
-        [Authorize]
+        //[Authorize]
         public async Task<IActionResult> GetAccountInfo()
         {
 
