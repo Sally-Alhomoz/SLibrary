@@ -2,7 +2,7 @@
   <div class="container mt-5">
     <h2 class="mb-4">Book List</h2>
 
-    <div class="mb-3 d-flex justify-content-end">
+    <div v-if="canAdd" class="mb-3 d-flex justify-content-end">
       <router-link to="/app/books/add" class="btn btn-primary">
         <i class="bi bi-plus-circle"></i> Add Book
       </router-link>
@@ -26,18 +26,19 @@
           <td>{{ book.available }}</td>
           <td>
             <div class="d-flex justify-content-center gap-2">
-              <button class="btn btn-sm btn-outline-danger"
+              <button v-if="isAdmin" class="btn btn-sm text-danger"
                       title="Delete Book"
                       @click="deleteBook(book.id)">
                 <i class="fas fa-trash"></i>
               </button>
 
- 
-              <button class="btn btn-sm btn-outline-primary"
-                      title="Reserve Book"
-                      :disabled="book.available == 0">
+
+              <router-link :to="{ name: 'ReserveBook', params: { title: book.title } }"
+                           class="btn btn-sm text-primary"
+                           title="Reserve Book"
+                           :disabled="book.available == 0">
                 <i class="fas fa-bookmark"></i>
-              </button>
+              </router-link>
             </div>
           </td>
         </tr>
@@ -54,12 +55,13 @@
 
 
 <script setup>
-  import { ref, onMounted } from 'vue'
+  import { ref, onMounted, computed } from 'vue'
   import axios from 'axios'
 
   const books = ref([])
   const error = ref('')
   const loading = ref(true)
+
 
   const API_BASE_URL = 'https://localhost:7037';
 
@@ -79,6 +81,30 @@
     await read()
 
   }
+
+  const getRole = () => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      return null
+    }
+
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+  }
+
+  const isAdmin = computed(() => {
+    const role = getRole()
+    return role === 'Admin'
+  })
+
+  const isAuditor = computed(() => {
+    const role = getRole()
+    return role === 'Auditor'
+  })
+
+  const canAdd = computed(() => isAdmin.value || isAuditor.value)
+
+
 
 
   onMounted(() => {
