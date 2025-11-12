@@ -1,7 +1,14 @@
 <template>
   <div class="d-flex min-vh-100 bg-light">
     <aside class="sidebar bg-dark text-white p-3 shadow-sm">
-      <h5 class="text-white mb-4 border-bottom pb-2">SLibrary</h5>
+      <div class="d-flex justify-content-between align-items-center px-3 pt-3 pb-3 border-bottom border-secondary">
+        <h4 class="m-0 text-white fw-bold">SLibrary</h4>
+        <router-link to="/app/profile" class="text-white-50 text-decoration-none hover:text-white">
+          <i class="fas fa-user-circle fa-lg"></i>
+        </router-link>
+      </div>
+
+
       <ul class="nav flex-column">
         <li class="nav-item">
           <router-link to="/app/dashboard" class="nav-link text-white" active-class="active">
@@ -10,13 +17,13 @@
         </li>
         <li class="nav-item">
           <router-link to="/app/books" class="nav-link text-white" active-class="active">
-            <i class="fas fa-book me-2"></i> Books
+            <i class="fa fa-book me-2"></i> Books
           </router-link>
         </li>
 
         <li class="nav-item">
           <router-link to="/app/reservations" class="nav-link text-white" active-class="active">
-            <i class="fas fa-bookmark"></i> Reservations
+            <i class="fa fa-bookmark"></i> Reservations
           </router-link>
         </li>
 
@@ -28,7 +35,7 @@
       </ul>
       <div class="mt-auto pt-3 border-top">
         <button @click="logout" class="btn btn-outline-danger w-100">
-          <i class="bi bi-box-arrow-right me-2"></i> Logout
+          <i class="fas fa-sign-out-alt me-2"></i> Logout
         </button>
       </div>
     </aside>
