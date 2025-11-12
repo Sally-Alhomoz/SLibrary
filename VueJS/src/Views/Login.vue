@@ -22,7 +22,7 @@
     <div class="card-footer text-center">
       <p class="mb-0 text-muted">
         Create an account?
-        <router-link to="/register" class="text-decoration-none">Register</router-link>
+        <router-link :to="{name:'Register'}" class="text-decoration-none">Register</router-link>
       </p>
     </div>
 
