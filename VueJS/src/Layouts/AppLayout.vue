@@ -10,19 +10,19 @@
         </li>
         <li class="nav-item">
           <router-link to="/app/books" class="nav-link text-white" active-class="active">
-            <i class="bi bi-book me-2"></i> Books
+            <i class="fas fa-book me-2"></i> Books
           </router-link>
         </li>
 
         <li class="nav-item">
           <router-link to="/app/reservations" class="nav-link text-white" active-class="active">
-            <i class="bi bi-book me-2"></i> Reservations
+            <i class="fas fa-bookmark"></i> Reservations
           </router-link>
         </li>
 
         <li class="nav-item">
           <router-link to="/app/users" class="nav-link text-white" active-class="active">
-            <i class="bi bi-book me-2"></i> Users
+            <i class="fas fa-users me-2"></i> Users
           </router-link>
         </li>
       </ul>
