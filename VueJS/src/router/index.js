@@ -8,6 +8,11 @@ import ReservationList from '../Views/Reservation View/ReservationList.vue'
 import Register from '../Views/Account View/Register.vue'
 import AddBook from '../Views/Book View/AddBook.vue'
 import UserList from '../Views/Account View/UserList.vue'
+import ClinetInfo from '../Views/Reservation View/ClientInfo.vue'
+import ReserveBook from '../Views/Book View/ReserveBook.vue'
+import Profile from '../Views/Account View/Profile.vue'
+import ChangePassword from '../Views/Account View/ChangePassword.vue'
+import EditAccount from '../Views/Account View/EditAccount.vue'
 
 const routes = [
   {
@@ -49,6 +54,31 @@ const routes = [
         path: 'users',
         name: 'UserList',
         component: UserList
+      },
+      {
+        path: 'clientinfo/:name',
+        name: 'ClientInfo',
+        component: ClinetInfo
+      },
+      {
+        path: 'reservebook/:title',
+        name: 'ReserveBook',
+        component: ReserveBook
+      },
+      {
+        path: 'profile',
+        name: 'Profile',
+        component: Profile
+      },
+      {
+        path: 'profile/changepassword',
+        name: 'ChangePassword',
+        component: ChangePassword
+      },
+      {
+        path: 'profile/editaccount',
+        name: 'EditAccount',
+        component: EditAccount
       }
     ]
   }
@@ -63,12 +93,14 @@ const router = createRouter({
 
 router.beforeEach((to, from, next) => {
   const token = localStorage.getItem('token')
-  const authRequired = to.path !== '/'
 
-  if (authRequired && !token) {
-    next('/') 
+  const publicRoutes = ['/', '/register']
+  const isPublic = publicRoutes.includes(to.path)
+
+  if (!isPublic && !token) {
+    next('/')  
   } else {
-    next() 
+    next()    
   }
 })
 
