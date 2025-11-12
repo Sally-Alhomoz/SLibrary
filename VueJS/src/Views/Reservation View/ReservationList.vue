@@ -15,7 +15,14 @@
       <tbody class="text-center">
         <tr v-for="res in reservations" :key="res.id">
           <td>{{res.reservedBy}}</td>
-          <td>{{res.clientName}}</td>
+          <td>
+            <router-link :to="{ name: 'ClientInfo', params: { name: res.clientName } }"
+                         class="btn btn-sm text-primary"
+                         title="View Client Info">
+              <i class="fa fa-eye"></i>
+            </router-link>
+            {{res.clientName}}
+          </td>
           <td>{{res.bookTitle}}</td>
           <td>{{formatDate(res.reservedDate)}}</td>
           <td>
@@ -125,10 +132,11 @@
     const clientName = reservation.clientName;
 
     const apiUrl = `${API_BASE_URL}/api/Reservations/Release?title=${encodeURIComponent(title)}&clientname=${encodeURIComponent(clientName)}`;
-    const response = await axios.delete(apiUrl);
+    const response = await axios.delete(apiUrl)
 
     await read()
   }
+
 
   onMounted(() => {
     read()
