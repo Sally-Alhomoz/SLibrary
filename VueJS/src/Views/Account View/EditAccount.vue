@@ -6,7 +6,7 @@
 
         <div class="card shadow-lg border-0 rounded-xl">
           <div class="card-body p-5">
-            <form @submit.prevent="editEmail">
+            <form @submit.prevent="confirm">
               <div class="mb-3">
                 <input v-model="newEmail"
                        placeholder="New email"
@@ -41,6 +41,25 @@
     return localStorage.getItem('token');
   };
 
+
+  const confirm = async () => {
+    const result = await Swal.fire({
+      title: 'Save Change?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Save',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      showCloseButton: true
+    })
+
+    if (result.isConfirmed) {
+      await editEmail()
+    }
+  }
+
+
   const editEmail = async () => {
     const token = getToken();
     if (!token) {
@@ -57,6 +76,15 @@
         Authorization: `Bearer ${token}`
       }
     })
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'Account information updated.',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    })
+
     router.push('/app/profile')
 
   }
