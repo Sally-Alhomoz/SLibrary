@@ -28,7 +28,7 @@
             <div class="d-flex justify-content-center gap-2">
               <button v-if="isAdmin" class="btn btn-sm text-danger"
                       title="Delete Book"
-                      @click="deleteBook(book.id)">
+                      @click="confirm(book.id)">
                 <i class="fas fa-trash"></i>
               </button>
 
@@ -65,6 +65,24 @@
 
   const API_BASE_URL = 'https://localhost:7037';
 
+  const confirm = async (id) => {
+    const result = await Swal.fire({
+      title: 'Delete Book?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      showCloseButton: true
+    })
+
+    if (result.isConfirmed) {
+      await deleteBook(id)
+    }
+  }
+
+
   const read = async () => {
     loading.value = true
     error.value = ''
@@ -77,6 +95,14 @@
 
   const deleteBook = async (id) => {
     await axios.delete(`${API_BASE_URL}/api/Books?id=${encodeURIComponent(id)}`)
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'Book deleted.',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    })
 
     await read()
 

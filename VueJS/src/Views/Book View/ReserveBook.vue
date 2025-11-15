@@ -3,7 +3,7 @@
     <h2 class="text-center mb-1">Reserve Book </h2>
     <br />
 
-    <form @submit.prevent="Reserve">
+    <form @submit.prevent="confirm">
       <div class="mb-3">
         <label for="bookTitle" class="form-label">Book Title</label>
         <input v-model="bookTitle"
@@ -55,6 +55,7 @@
   import { ref, onMounted } from 'vue'
   import { useRoute, useRouter } from 'vue-router'
   import axios from 'axios'
+  import Swal from 'sweetalert2'
 
   const route = useRoute()
   const router = useRouter()
@@ -72,6 +73,23 @@
   const getToken = () => {
     return localStorage.getItem('token');
   };
+
+  const confirm = async () => {
+    const result = await Swal.fire({
+      title: 'Reserve Book?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Reserve',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      showCloseButton: true
+    })
+
+    if (result.isConfirmed) {
+      await Reserve()
+    }
+  }
 
   onMounted(() => {
     const title = route.params.title
@@ -104,6 +122,15 @@
         Authorization: `Bearer ${token}`
       }
     })
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'Book Reseved',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    })
+
     router.push('/app/books')
   }
 
