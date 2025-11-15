@@ -26,7 +26,7 @@
           <td v-if="isAdmin">
             <button class="btn btn-sm text-danger"
                     title="Delete User"
-                    @click="DeleteUser(user.username)">
+                    @click="confirm(user.username)">
               <i class="fas fa-trash"></i>
 
             </button>
@@ -47,6 +47,23 @@
   const loading = ref(true)
 
   const API_BASE_URL = 'https://localhost:7037';
+
+  const confirm = async (username) => {
+    const result = await Swal.fire({
+      title: 'Delete user?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#D33',
+      cancelButtonColor: 'gray',
+      showCloseButton: true
+    })
+
+    if (result.isConfirmed) {
+      await DeleteUser(username)
+    }
+  }
 
 
   const Read = async () => {
@@ -83,6 +100,15 @@
         Authorization: `Bearer ${token}`
       }
     })
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'User deleted.',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    })
+
     await Read() 
    
   }

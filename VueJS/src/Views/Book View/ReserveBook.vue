@@ -82,7 +82,7 @@
       confirmButtonText: 'Reserve',
       cancelButtonText: 'Cancel',
       confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      cancelButtonColor: 'gray',
       showCloseButton: true
     })
 
