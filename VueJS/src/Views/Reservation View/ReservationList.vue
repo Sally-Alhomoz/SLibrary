@@ -34,7 +34,7 @@
                     type="button"
                     class="btn btn-link text-danger p-0 action-button"
                     title="Release Book"
-                    @click="ReleaseBook(res)">
+                    @click="confirm(res)">
               <i class="fas fa-arrow-alt-circle-up me-1"></i> Release
             </button>
           </td>
@@ -67,6 +67,24 @@
   const loading = ref(true)
 
   const API_BASE_URL = 'https://localhost:7037';
+
+
+  const confirm = async (reservation) => {
+    const result = await Swal.fire({
+      title: 'Relase Book?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Release',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      showCloseButton: true
+    })
+
+    if (result.isConfirmed) {
+      await ReleaseBook(reservation)
+    }
+  }
 
   const read = async () => {
     loading.value = true
@@ -133,6 +151,14 @@
 
     const apiUrl = `${API_BASE_URL}/api/Reservations/Release?title=${encodeURIComponent(title)}&clientname=${encodeURIComponent(clientName)}`;
     const response = await axios.delete(apiUrl)
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'Book released.',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    })
 
     await read()
   }
