@@ -24,7 +24,7 @@
             </span>
           </td>
           <td v-if="isAdmin">
-            <button class="btn btn-sm text-danger"
+            <button v-if="user.username !== currentUsername" class="btn btn-sm text-danger"
                     title="Delete User"
                     @click="confirm(user.username)">
               <i class="fas fa-trash"></i>
@@ -64,6 +64,19 @@
       await DeleteUser(username)
     }
   }
+
+  const getCurrentUsername = () => {
+    const token = localStorage.getItem('token')
+    if (!token) {
+      return null
+    }
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    return payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
+  }
+
+  const currentUsername = computed(() => {
+    return getCurrentUsername();
+  });
 
 
   const Read = async () => {
