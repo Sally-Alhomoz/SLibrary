@@ -33,12 +33,17 @@
               </button>
 
 
-              <router-link :to="{ name: 'ReserveBook', params: { title: book.title } }"
+              <button class="btn btn-sm text-primary"
+                      title="Reserve Book"
+                      @click="ReserveBookModal(book.title)">
+                <i class="fas fa-bookmark"></i>
+              </button>
+              <!--<router-link :to="{ name: 'ReserveBook', params: { title: book.title } }"
                            class="btn btn-sm text-primary"
                            title="Reserve Book"
                            :disabled="book.available == 0">
                 <i class="fas fa-bookmark"></i>
-              </router-link>
+              </router-link>-->
             </div>
           </td>
         </tr>
@@ -58,12 +63,17 @@
   import { ref, onMounted, computed } from 'vue'
   import axios from 'axios'
 
+  const client = ref({})
   const books = ref([])
   const error = ref('')
   const loading = ref(true)
 
 
   const API_BASE_URL = 'https://localhost:7037';
+
+  const getToken = () => {
+    return localStorage.getItem('token');
+  };
 
   const confirm = async (id) => {
     const result = await Swal.fire({
@@ -185,6 +195,94 @@
     });
 
     await read();
+  }
+
+  const ReserveBookModal = async (title) => {
+    const Modalhtml = `
+        <div class="mb-3 text-start">
+            <label for="swal-title" class="form-label text-dark">Book Title</label>
+            <input id="swal-title" type="text" class="form-control" placeholder="Book Title" value="${title}" required>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="swal-phone" class="form-label text-dark">Phone Number</label>
+            <input id="swal-phone" type="text" class="form-control" placeholder="Phone Number" required>
+        </div>
+
+        <div class="mb-3 text-start">
+            <label for="swal-name" class="form-label text-dark">Client Name</label>
+            <input id="swal-name" type="text" class="form-control" placeholder="Client Name" required>
+        </div>
+
+        <div class="mb-3 text-start">
+            <label for="swal-address" class="form-label text-dark">Address</label>
+            <input id="swal-address" type="text" class="form-control" placeholder="Address" required>
+        </div>
+
+    `;
+
+    const result = await Swal.fire({
+      title: 'Reserve Book',
+      html: Modalhtml,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Reserve',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: 'gray',
+      focusConfirm: false,
+
+      preConfirm: () => {
+        const Title = document.getElementById('swal-title').value.trim();
+        const phone = document.getElementById('swal-phone').value.trim();
+        const name = document.getElementById('swal-name').value.trim();
+        const address = document.getElementById('swal-address').value.trim();
+
+        if (!Title || !phone || !name || !address) {
+          Swal.showValidationMessage('All Information required !');
+          return false;
+        }
+        return { Title, phone, name , address };
+      }
+    });
+    if (result.isConfirmed) {
+      const { Title, phone, name, address } = result.value;
+      await ReserveBook(Title, phone, name, address);
+    }
+  };
+
+  const ReserveBook = async (Title ,phone , name , address ) => {
+    const token = getToken();
+    if (!token) {
+      error.value = 'You must be logged in to view client information.'
+      loading.value = false
+      return
+    }
+
+    const url = `${API_BASE_URL}/api/Reservations/Reserve`;
+    const params = {
+      title: Title,
+      clientname: name,
+      phoneNo: phone,
+      address: address
+    }
+
+    const response = await axios.post(url, null, {
+      params,
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    await Swal.fire({
+      title: 'Success!',
+      text: 'Book Reseved',
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    await read();
+
   }
 
   onMounted(() => {
