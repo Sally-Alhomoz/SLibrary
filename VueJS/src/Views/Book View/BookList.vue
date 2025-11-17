@@ -3,9 +3,9 @@
     <h2 class="mb-4">Book List</h2>
 
     <div v-if="canAdd" class="mb-3 d-flex justify-content-end">
-      <router-link to="/app/books/add" class="btn btn-primary">
-        <i class="bi bi-plus-circle"></i> Add Book
-      </router-link>
+      <button class="btn btn-primary" @click="AddBookModal">
+        <i class="fas fa-plus-circle"></i> Add Book
+      </button>
     </div>
 
     <table class="table table-striped table-bordered">
@@ -130,8 +130,62 @@
 
   const canAdd = computed(() => isAdmin.value || isAuditor.value)
 
+  const AddBookModal = async () => {
+    const Modalhtml = `
+        <div class="mb-3 text-start">
+            <label for="swal-title" class="form-label text-dark">Title</label>
+            <input id="swal-title" type="text" class="form-control" placeholder="Book Title" required>
+        </div>
+        <div class="mb-3 text-start">
+            <label for="swal-author" class="form-label text-dark">Author</label>
+            <input id="swal-author" type="text" class="form-control" placeholder="Author Name" required>
+        </div>
+    `;
 
+    const result = await Swal.fire({
+      title: 'Add New Book',
+      html: Modalhtml,
+      icon: 'info',
+      showCancelButton: true,
+      confirmButtonText: 'Add',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: 'gray',
+      focusConfirm: false, 
 
+      preConfirm: () => {
+        const title = document.getElementById('swal-title').value.trim();
+        const author = document.getElementById('swal-author').value.trim();
+
+        if (!title || !author) {
+          Swal.showValidationMessage('Title and Author are required!');
+          return false;
+        }
+        return { title, author };
+      }
+    });
+    if (result.isConfirmed) {
+      const { title, author } = result.value;
+      await AddBook(title, author);
+    }
+  };
+
+  const AddBook = async (title, author) => {
+    await axios.post(`${API_BASE_URL}/api/Books`, {
+      Title: title,
+      Author: author
+    });
+
+    await Swal.fire({
+      title: 'Success!',
+      text: `Book ${title} Added.`,
+      icon: 'success',
+      timer: 2000,
+      showConfirmButton: false
+    });
+
+    await read();
+  }
 
   onMounted(() => {
     read()
