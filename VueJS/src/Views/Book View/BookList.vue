@@ -103,19 +103,36 @@
     loading.value = false
   }
 
+
   const deleteBook = async (id) => {
-    await axios.delete(`${API_BASE_URL}/api/Books?id=${encodeURIComponent(id)}`)
+    try {
+      await axios.delete(`${API_BASE_URL}/api/Books?id=${encodeURIComponent(id)}`);
 
-    await Swal.fire({
-      title: 'Success!',
-      text: 'Book deleted.',
-      icon: 'success',
-      timer: 2000,
-      showConfirmButton: false
-    })
+      await Swal.fire({
+        title: 'Success! ✅',
+        text: 'Book deleted.',
+        icon: 'success',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    } catch (error) {
+      let errorMessage = 'An unexpected error occurred during deletion.';
 
-    await read()
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data;
+      } else if (error.response) {
+        errorMessage = `Error ${error.response.status}: Failed to delete the book.`;
+      }
 
+      await Swal.fire({
+        title: 'Deletion Failed 🛑',
+        text: errorMessage,
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'OK'
+      });
+    }
+    await read();
   }
 
   const getRole = () => {
