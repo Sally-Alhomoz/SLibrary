@@ -49,7 +49,7 @@
         Password: password.value
       })
       localStorage.setItem('token', res.data.token)
-      router.push('/app')
+      router.push('/app/dashboard')
     } catch (err) {
       error.value = 'Invalid username or password'
     }
