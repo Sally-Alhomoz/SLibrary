@@ -1,7 +1,6 @@
 <template>
   <div>
     <h3 class="mb-4 text-primary">Welcome, {{ username }}!</h3>
-    <p>This is your dashboard.</p>
   </div>
 </template>
 
