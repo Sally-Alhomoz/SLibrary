@@ -16,11 +16,16 @@
         <tr v-for="res in reservations" :key="res.id">
           <td>{{res.reservedBy}}</td>
           <td>
-            <router-link :to="{ name: 'ClientInfo', params: { name: res.clientName } }"
+            <!--<router-link :to="{ name: 'ClientInfo', params: { name: res.clientName } }"
                          class="btn btn-sm text-primary"
                          title="View Client Info">
               <i class="fa fa-eye"></i>
-            </router-link>
+            </router-link>-->
+            <button class="btn btn-sm text-primary"
+                    title="client info"
+                    @click="clientInfoModal(res)">
+              <i class="fa fa-eye"></i>
+            </button>
             {{res.clientName}}
           </td>
           <td>{{res.bookTitle}}</td>
@@ -65,13 +70,17 @@
   const reservations = ref([])
   const error = ref('')
   const loading = ref(true)
+  const client = ref({})
 
   const API_BASE_URL = 'https://localhost:7037';
 
+  const getToken = () => {
+    return localStorage.getItem('token');
+  };
 
   const confirm = async (reservation) => {
     const result = await Swal.fire({
-      title: 'Relase Book?',
+      text: `Do you want to release ${reservation.bookTitle} ? `,
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Release',
@@ -154,13 +163,74 @@
 
     await Swal.fire({
       title: 'Success!',
-      text: 'Book released.',
+      text: `${reservation.bookTitle} released.`,
       icon: 'success',
       timer: 2000,
       showConfirmButton: false
     })
 
     await read()
+  }
+
+
+  const clientInfoModal = async (reservation) => {
+    const name = reservation.clientName;
+    let modalHtml = '';
+
+    const clientData = await getClientInfo(name);
+    client.value = clientData;
+
+    if (clientData) {
+      modalHtml = `
+      <div class="p-3">
+        <dl class="row mb-0 text-start">
+
+            <dt class="col-sm-4">Name:</dt>
+            <dd class="col-sm-7 text-center">${clientData.fullName}</dd> 
+            
+            <dt class="col-sm-4">Phone:</dt>
+            <dd class="col-sm-8 text-center">${clientData.phoneNo}</dd>
+            
+            <dt class="col-sm-4">Address:</dt>
+            <dd class="col-sm-8 text-center">${clientData.address}</dd>
+            
+            </dl>
+      </div>
+                    `;
+    }
+    await Swal.fire({
+      title: 'Client Information',
+      html: modalHtml,
+      showCancelButton: true,
+      showConfirmButton: false,
+      cancelButtonText: 'Close',
+      cancelButtonColor: 'gray',
+      showCloseButton: true
+    })
+  }
+
+  const getClientInfo = async (name) => {
+    if (!name) {
+      error.value = 'Client name is required.'
+      loading.value = false
+      return
+    }
+
+    const token = getToken();
+    if (!token) {
+      error.value = 'You must be logged in to view client information.'
+      loading.value = false
+      return
+    }
+
+    const response = await axios.get(`${API_BASE_URL}/api/Clients/${encodeURIComponent(name)}`, {
+      headers: {
+        Authorization: `Bearer ${token}`
+      }
+    })
+
+    return response.data
+
   }
 
 
