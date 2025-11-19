@@ -22,5 +22,11 @@ namespace SLibrary.Business.Interfaces
         public bool ValidatePassword(string username, string password);
         public bool EditEmail(string username, string newemail);
         public Userdto GetAccountInfo(string username);
+        bool toggleUserStatus(string username);
+        (List<Userdto> users, int totalCount) GetUsersPaged(int page,
+            int pageSize,
+            string search,
+            string sortBy,
+            string sortDirection);
     }
 }
