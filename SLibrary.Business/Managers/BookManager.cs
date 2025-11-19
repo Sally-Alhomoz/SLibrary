@@ -94,5 +94,59 @@ namespace SLibrary.Business.Managers
 
         }
 
+        public (List<Bookdto> books, int totalCount) GetUsersPaged(
+            int page =1,
+            int pageSize=10,
+            string search="",
+            string sortBy="title",
+            string sortDirection="asc")
+        {
+            var query = _uow.DBBooks.GetBooks().AsQueryable();
+
+            // Global search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLower();
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(s) ||
+                    b.Author.ToLower().Contains(s)
+                );
+            }
+
+            query = (sortBy?.ToLower(), sortDirection?.ToLower()) switch
+            {
+                ("title", "desc") => query.OrderByDescending(b => b.Title),
+                ("title", _) => query.OrderBy(b => b.Title),
+
+                ("author", "desc") => query.OrderByDescending(b => b.Author),
+                ("author", _) => query.OrderBy(b => b.Author),
+
+                ("reserved", "desc") => query.OrderByDescending(b => b.Reserved),
+                ("reserved", _) => query.OrderBy(b => b.Reserved),
+
+                ("available", "desc") => query.OrderByDescending(b => b.Available),
+                ("available", _) => query.OrderBy(b => b.Available),
+
+                _ => query.OrderBy(b => b.Title) // default sort
+            };
+
+            int totalCount = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new Bookdto
+                {
+                    ID = b.ID,
+                    Title=b.Title,
+                    Author =b.Author,
+                    Reserved=b.Reserved,
+                    Available=b.Available
+                })
+                .ToList();
+
+            return (items, totalCount);
+        }
+
     }
 }

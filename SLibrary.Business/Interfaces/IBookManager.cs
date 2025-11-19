@@ -9,5 +9,10 @@ public interface IBookManager
     List<Bookdto> GetAllBooks();
 
     string Delete(int id);
+    (List<Bookdto> books, int totalCount) GetUsersPaged(int page,
+    int pageSize,
+    string search,
+    string sortBy,
+    string sortDirection);
 
 }
