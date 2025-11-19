@@ -22,14 +22,14 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Get all books from the library.
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> Read()
-        {
-            _logger.LogInformation("GET called to fetch all books.");
-            var books =  _bookManager.GetAllBooks();
-            _logger.LogInformation("Returned {Count} books.", books.Count);
-            return Ok(books);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Read()
+        //{
+        //    _logger.LogInformation("GET called to fetch all books.");
+        //    var books =  _bookManager.GetAllBooks();
+        //    _logger.LogInformation("Returned {Count} books.", books.Count);
+        //    return Ok(books);
+        //}
 
         /// <summary>
         /// Add a book to the library.
@@ -54,6 +54,7 @@ namespace SLibraryAPI.Controllers
         /// Add a book to the library.
         /// </summary>
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create([FromBody] CreateBookdto dto)
         {
             _logger.LogInformation("POST called to add a new book");
@@ -69,7 +70,7 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Delete a book to the library.
         /// </summary>
-        //[Authorize]
+        [Authorize]
         [HttpDelete]
         public async Task<IActionResult> Delete(int id)
         {
@@ -86,6 +87,25 @@ namespace SLibraryAPI.Controllers
                 _logger.LogWarning("Failed to delete book with id : {id} - {result}", id, result);
                 return BadRequest(result);
             }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Read(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string search = "",
+            [FromQuery] string sortBy = "title",
+            [FromQuery] string sortDirection = "asc")
+        {
+            var (users, totalCount) = _bookManager.GetUsersPaged(
+                page, pageSize, search, sortBy, sortDirection);
+
+            return Ok(new
+            {
+                items = users,
+                totalCount = totalCount
+            });
         }
 
     }

@@ -1,8 +1,11 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Shared;
 using SLibrary.Business.Interfaces;
 using SLibrary.Business.Managers;
+using System.Text.Json;
 
 namespace SLibraryAPI.Controllers
 {
@@ -23,21 +26,22 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Get all Reservations.
         /// </summary>
-        [HttpGet]
-        public async Task<IActionResult> Read()
-        {
-            _logger.LogInformation("GET called to fetch all reservations");
-            var reservations = _reservationMng.GetAllReservations();
-            _logger.LogInformation("Returned {Count} reservations.", reservations.Count);
-            return Ok(reservations);
+        //[HttpGet]
+        //public async Task<IActionResult> Read()
+        //{
+        //    _logger.LogInformation("GET called to fetch all reservations");
+        //    var reservations = _reservationMng.GetAllReservations();
+        //    _logger.LogInformation("Returned {Count} reservations.", reservations.Count);
+        //    return Ok(reservations);
 
-        }
+        //}
 
         /// <summary>
         /// Get a reservation by ID.
         /// </summary>
 
         [HttpGet("GetByID")]
+        [Authorize]
         public async Task<IActionResult> GetReservation(int id)
         {
             _logger.LogInformation("GET called to fetch reservation with id : {id}",id);
@@ -56,7 +60,7 @@ namespace SLibraryAPI.Controllers
         /// Reserve a book from the library.
         /// </summary>
 
-        //[Authorize]
+        [Authorize]
         [HttpPost("Reserve")]
         public async Task<IActionResult> Create([FromQuery] string title, [FromQuery] string clientname, [FromQuery] string phoneNo , [FromQuery] string address)
         {
@@ -84,7 +88,7 @@ namespace SLibraryAPI.Controllers
         /// <summary>
         /// Release a book from the library.
         /// </summary>
-        //[Authorize]
+        [Authorize]
         [HttpDelete("Release")]
         public async Task<IActionResult> Delete(string title, string clientname)
         {
@@ -101,6 +105,25 @@ namespace SLibraryAPI.Controllers
                 _logger.LogWarning("Failed to release reservations - {result}", result);
                 return BadRequest("Book Can Not be released");
             }
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Read(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string search = "",
+            [FromQuery] string sortBy = "reservedDate",
+            [FromQuery] string sortDirection = "asc")
+        {
+            var (reservations, totalCount) = _reservationMng.GetReservationsPaged(
+                page, pageSize, search, sortBy, sortDirection);
+
+            return Ok(new
+            {
+                items = reservations,     
+                totalCount                
+            });
         }
     }
 }

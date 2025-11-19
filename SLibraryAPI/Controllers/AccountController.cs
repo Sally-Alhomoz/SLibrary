@@ -103,21 +103,21 @@ namespace SLibraryAPI.Controllers
         ///Get all users.
         ///</summary>
         //[Authorize]
-        [HttpGet]
-        public async Task<IActionResult> Read()
-        {
-            _logger.LogInformation("GET called to fetch all users");
-            var users = _userManager.GetAllUsers();
-            _logger.LogInformation("Returned {Count} users.", users.Count);
-            return Ok(users);
-        }
+        //[HttpGet]
+        //public async Task<IActionResult> Read()
+        //{
+        //    _logger.LogInformation("GET called to fetch all users");
+        //    var users = _userManager.GetAllUsers();
+        //    _logger.LogInformation("Returned {Count} users.", users.Count);
+        //    return Ok(users);
+        //}
 
         /// <summary>
         /// Delete User.
         /// </summary>
 
         [HttpDelete]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> Delete(string username)
         {
             _logger.LogInformation("DELETE called to delete a user ");
@@ -146,6 +146,7 @@ namespace SLibraryAPI.Controllers
         /// Sets a user's status to inactive (when client logout).
         /// </summary>
         [HttpPatch("SetInActive/{username}")]
+        [Authorize]
         public IActionResult SetInActive(string username)
         {
             _logger.LogInformation("PATCH called to set user {Username} to inactive.", username);
@@ -168,7 +169,7 @@ namespace SLibraryAPI.Controllers
         /// Resets a user password
         /// </summary>
         [HttpPatch]
-        //[Authorize]
+        [Authorize]
         public IActionResult RestPassword([FromBody] ResetPassworddto dto)
         {
 
@@ -201,8 +202,8 @@ namespace SLibraryAPI.Controllers
         /// Edit Email
         /// </summary>
         [HttpPatch("EditEmail")]
-        //[Authorize]
-        public IActionResult EditEmail([FromBody] EditAccountdto dto)
+        [Authorize]
+        public IActionResult EditEmail([FromBody] EditEmaildto dto)
         {
 
             var username = User.Identity.Name;
@@ -233,7 +234,7 @@ namespace SLibraryAPI.Controllers
         ///Get users info.
         ///</summary>
         [HttpGet("GetAccountInfo")]
-        //[Authorize]
+        [Authorize]
         public async Task<IActionResult> GetAccountInfo()
         {
 
@@ -252,6 +253,69 @@ namespace SLibraryAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPatch("togglestatus")]
+        [Authorize]
+        public async Task<IActionResult> ToggleUserStatus(string username)
+        {
+            var user = _userManager.GetByUsername(username);
+            if (user == null) return NotFound("User not found.");
+
+            var result = _userManager.toggleUserStatus(username);
+
+            if (result)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return BadRequest();
+
+            var user = _userManager.GetByUsername(username);
+            if (user != null)
+            {
+                var success = _userManager.SetUserInActive(username);
+
+                if (success)
+                {
+                    _logger.LogInformation("User {Username} successfully set to inactive.", username);
+                    return NoContent();
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to set user {Username} to inactive.", username);
+                    return StatusCode(500, "Failed to update user status.");
+                }
+            }
+
+            return Ok(new { message = "Logged out and deactivated" });
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Read(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string search = "",          
+            [FromQuery] string sortBy = "username",  
+            [FromQuery] string sortDirection = "asc") 
+        {
+            var (users, totalCount) = _userManager.GetUsersPaged(
+                page, pageSize, search, sortBy, sortDirection);
+
+            return Ok(new
+            {
+                items = users,
+                totalCount = totalCount
+            });
+        }
+
 
     }
+
 }
