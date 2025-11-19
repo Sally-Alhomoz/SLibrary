@@ -30,61 +30,36 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import axios from 'axios'
+  import { useConfirm, successDialog, errorDialog } from '@/Component/Modals/ConfirmationModal'
+  import api from '@/Component/AuthServices/authAPI'
 
   const newEmail = ref('')
-
+  const confirmDialog= useConfirm().confirmDialog
   const router = useRouter()
+
 
   const API_BASE_URL = 'https://localhost:7037';
 
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
-
-
   const confirm = async () => {
-    const result = await Swal.fire({
-      title: 'Save Change?',
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonText: 'Save',
-      cancelButtonText: 'Cancel',
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: 'gray',
-      showCloseButton: true
-    })
-
-    if (result.isConfirmed) {
+    const confirmed = await confirmDialog(
+      'Save Changes?',
+      '',
+      'Save'
+    )
+    if (confirmed) {
       await editEmail()
     }
   }
 
 
   const editEmail = async () => {
-    const token = getToken();
-    if (!token) {
-      error.value = 'You must be logged in to view client information.'
-      return
-    }
-
     const params = {
       NewEmail: newEmail.value
     };
 
-    await axios.patch(`${API_BASE_URL}/api/Account/EditEmail`, params, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    await api.patch(`${API_BASE_URL}/api/Account/EditEmail`, params)
 
-    await Swal.fire({
-      title: 'Success!',
-      text: 'Account information updated.',
-      icon: 'success',
-      timer: 2000,
-      showConfirmButton: false
-    })
-
+    await successDialog('Account information updated.')
     router.push('/app/profile')
 
   }

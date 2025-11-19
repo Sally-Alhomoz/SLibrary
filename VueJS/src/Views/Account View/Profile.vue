@@ -46,32 +46,18 @@
 
 <script setup>
   import { ref, onMounted, computed } from 'vue'
-  import axios from 'axios'
+  import api from '@/Component/AuthServices/authAPI'
 
   const API_BASE_URL = 'https://localhost:7037';
 
   const username = ref('')
   const email = ref('')
 
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
+
 
   const getInfo = async () => {
 
-    const token = getToken();
-    if (!token) {
-      error.value = 'You must be logged in to view client information.'
-      loading.value = false
-      return
-    }
-
-
-    const response = await axios.get(`${API_BASE_URL}/api/Account/GetAccountInfo`, {
-      headers: {
-        Authorization: `Bearer ${token}`
-      }
-    })
+    const response = await api.get(`${API_BASE_URL}/api/Account/GetAccountInfo`)
     username.value = response.data.username
     email.value = response.data.email
   }

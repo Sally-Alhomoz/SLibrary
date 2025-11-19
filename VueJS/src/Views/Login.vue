@@ -3,7 +3,7 @@
     <h1 class="text-center mb-1">SLibrary</h1>
     <h2 class="text-center h4 mb-4">Login</h2>
 
-    <form @submit.prevent="login">
+    <form @submit.prevent="Login">
       <div class="mb-3">
         <input v-model="username"
                placeholder="Username"
@@ -42,7 +42,7 @@
   const error = ref('')
   const router = useRouter()
 
-  const login = async () => {
+  const Login = async () => {
     try {
       const res = await axios.post('/api/Account/Login', {
         Username: username.value,
