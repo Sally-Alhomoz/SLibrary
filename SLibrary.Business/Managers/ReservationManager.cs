@@ -1,15 +1,17 @@
-﻿using SLibrary.DataAccess;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Shared;
+using SLibrary.Business.Interfaces;
+using SLibrary.DataAccess;
 using SLibrary.DataAccess.Interfacses;
+using SLibrary.DataAccess.Models;
+using SLibrary.DataAccess.SUnitOfWork;
 using System;
 using System.Collections.Generic;
-using SLibrary.DataAccess.Models;
-using Shared;
-using System.Linq;
 using System.Collections.Immutable;
-using SLibrary.Business.Interfaces;
-using Microsoft.Extensions.Logging;
-using SLibrary.DataAccess.SUnitOfWork;
+using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace SLibrary.Business.Managers
 {
@@ -143,6 +145,61 @@ namespace SLibrary.Business.Managers
                 ReleaseDate = res.ReleaseDate
             };
             return resdto;
+        }
+
+        public (List<Reservationdto> items, int totalCount) GetReservationsPaged(
+            int page = 1,
+            int pageSize = 10,
+            string search = "",
+            string sortBy = "reservedDate",
+            string sortDirection = "asc")
+        {
+            var query = _uow.DBReservations.GetReservations().AsQueryable();
+
+            // Global search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLower();
+                query = query.Where(r =>
+                    r.ReservedBy.ToLower().Contains(s) ||
+                    r.ClientName.ToLower().Contains(s) ||
+                    r.BookTitle.ToLower().Contains(s) 
+                );
+            }
+
+            // Sorting
+            query = (sortBy?.ToLower(), sortDirection?.ToLower()) switch
+            {
+                ("reservedby", "desc") => query.OrderByDescending(r => r.ReservedBy),
+                ("reservedby", _) => query.OrderBy(r => r.ReservedBy),
+                ("clientname", "desc") => query.OrderByDescending(r => r.ClientName),
+                ("clientname", _) => query.OrderBy(r => r.ClientName),
+                ("booktitle", "desc") => query.OrderByDescending(r => r.BookTitle),
+                ("booktitle", _) => query.OrderBy(r => r.BookTitle),
+                ("reserveddate", "desc") => query.OrderByDescending(r => r.ReservedDate),
+                ("reserveddate", _) => query.OrderBy(r => r.ReservedDate),
+                ("releasedate", "desc") => query.OrderByDescending(r => r.ReleaseDate ?? DateTime.MaxValue),
+                ("releasedate", _) => query.OrderBy(r => r.ReleaseDate ?? DateTime.MaxValue),
+                _ => query.OrderByDescending(r => r.ReservedDate)
+            };
+
+            int totalCount = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(r => new Reservationdto
+                {
+                    ID = r.ID,
+                    ReservedBy = r.ReservedBy,
+                    ClientName = r.ClientName,
+                    BookTitle = r.BookTitle,
+                    ReservedDate = r.ReservedDate,
+                    ReleaseDate = r.ReleaseDate,
+                })
+                .ToList();
+
+            return (items, totalCount);
         }
     }
 }
