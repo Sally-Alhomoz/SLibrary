@@ -7,8 +7,12 @@ import 'bootstrap/dist/css/bootstrap.css'
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { initAuth } from '@/Component/AuthServices/Authentication'
 
 import axios from 'axios';
+
+
+initAuth()
 
 axios.defaults.baseURL = 'https://localhost:7037';
 
