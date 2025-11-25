@@ -1,63 +1,66 @@
 <template>
-  <div class="d-flex min-vh-100 bg-light">
-
-    <aside class="sidebar bg-sidebar-gray text-dark p-3 shadow-sm" :class="{ 'closed': !isSidebarOpen }">
-
-      <div class="d-flex justify-content-between align-items-center px-3 pt-3 pb-3 border-bottom border-secondary">
-        <h4 class="m-0 text-white fw-bold" v-if="isSidebarOpen">SLibrary</h4>
-        <button @click="toggleSidebar" class="btn btn-ghost toggle-btn" title="Toggle Sidebar">
-          <i class="fas fa-bars me-2"></i>
+  <div class="app-layout">
+    <aside class="sidebar" :class="{ 'closed': !isSidebarOpen }">
+      <div class="sidebar-header">
+        <h4 class="logo-text" v-if="isSidebarOpen">
+          <i class="fas fa-book-open logo-icon"></i> SLibrary
+        </h4>
+        <button @click="toggleSidebar" class="toggle-btn" title="Toggle Sidebar">
+          <i class="fas fa-bars"></i>
         </button>
       </div>
 
-      <ul class="nav flex-column flex-grow-1">
-
+      <ul class="nav-menu">
         <li class="nav-item">
           <router-link to="/app/dashboard" class="nav-link" active-class="active">
             <i class="fas fa-home me-2"></i>
-            <span v-if="isSidebarOpen">Dashboard</span>
+            <span class="link-text" v-if="isSidebarOpen">Home</span>
           </router-link>
         </li>
 
         <li class="nav-item">
           <router-link to="/app/books" class="nav-link" active-class="active">
             <i class="fa fa-book me-2"></i>
-            <span v-if="isSidebarOpen">Books</span>
+            <span class="link-text" v-if="isSidebarOpen">Books</span>
           </router-link>
         </li>
 
         <li class="nav-item">
           <router-link to="/app/reservations" class="nav-link" active-class="active">
             <i class="fa fa-bookmark me-2"></i>
-            <span v-if="isSidebarOpen">Reservations</span>
+            <span class="link-text" v-if="isSidebarOpen">Reservations</span>
           </router-link>
         </li>
 
         <li class="nav-item" v-if="isAdmin">
           <router-link to="/app/users" class="nav-link" active-class="active">
             <i class="fas fa-users me-2"></i>
-            <span v-if="isSidebarOpen">Users</span>
+            <span class="link-text" v-if="isSidebarOpen">Users</span>
           </router-link>
         </li>
       </ul>
 
+      <div class="sidebar-footer">
 
-      <div class="mt-auto pt-3 border-top">
-        <router-link to="/app/profile" class="btn btn-outline-dark w-100">
-          <i class="fas fa-user-circle me-2"></i>
-          <span v-if="isSidebarOpen">Profile</span>
-        </router-link>
-      </div>
-
-      <div class="mt-auto pt-3">
-        <button @click="logout" class="btn btn-outline-danger w-100" :class="{ 'btn-sm': !isSidebarOpen }">
-          <i class="fas fa-sign-out-alt me-2"></i>
-          <span v-if="isSidebarOpen">Logout</span>
+        <button @click="toggleUserMenu" class="user-profile-toggle" :class="{ 'active': isUserMenuOpen }">
+          <i class="fas fa-user-circle user-icon me-2"></i>
+          <span class="link-text user-name" v-if="isSidebarOpen"><strong>{{currentUsername}}</strong></span>
+          <i v-if="isSidebarOpen" class="fas fa-chevron-up toggle-arrow"></i>
         </button>
+
+        <div v-if="isUserMenuOpen" class="user-dropdown-menu">
+          <router-link to="/app/profile" class="dropdown-item profile-item" @click="isUserMenuOpen = false">
+            <i class="fas fa-user-circle me-2"></i> Profile
+          </router-link>
+          <div class="dropdown-divider"></div>
+          <button @click="logout" class="dropdown-item logout-item">
+            <i class="fas fa-sign-out-alt me-2 text-danger"></i> Logout
+          </button>
+        </div>
       </div>
     </aside>
 
-    <main class="flex-grow-1 p-4 overflow-auto">
+    <main class="main-content">
       <router-view />
     </main>
   </div>
@@ -66,120 +69,318 @@
 <script setup>
   import { ref, computed } from 'vue'
   import { useRouter } from 'vue-router'
-  import axios from 'axios'
+  import { useAuth } from '@/Component/AuthServices/Authentication'
+
 
   const isSidebarOpen = ref(true)
+  const isUserMenuOpen = ref(false)
+  const { isAdmin, currentUsername, logout: authLogout } = useAuth()
+
 
   const toggleSidebar = () => {
     isSidebarOpen.value = !isSidebarOpen.value
   }
 
-  const API_BASE_URL = 'https://localhost:7037';
+  const toggleUserMenu = () => {
+    isUserMenuOpen.value = !isUserMenuOpen.value
+  }
+
   const router = useRouter();
 
-  const getToken = () => {
-    return localStorage.getItem('token');
-  };
-
-  const getRole = () => {
-    const token = localStorage.getItem('token')
-    if (!token) {
-      return null
-    }
-
-    const payload = JSON.parse(atob(token.split('.')[1]))
-    return payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role']
+  const logout = async () => {
+    await authLogout()
+    router.push('/')
   }
-
-  const isAdmin = computed(() => {
-    const role = getRole()
-    return role === 'Admin'
-  })
-
-
-const logout = async () => {
-  const token = localStorage.getItem('token')
-  if (token) {
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]))
-      const username = payload['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name']
-      await axios.patch(`${API_BASE_URL}/api/Account/SetInActive/${username}`, null)
-    } catch (err) {
-      console.error('Logout failed:', err)
-    }
-  }
-  localStorage.removeItem('token')
-  router.push('/')
-}
 </script>
 
 <style scoped>
-  .bg-sidebar-gray {
-    background-color: #A9A9A9 !important;
-    border-right: 1px solid #E0E0E0;
-    position: relative; 
+
+    .app-layout {
+        display: flex;
+        min-height: 100vh;
+        width: 100%;
+        font-family: 'Inter', sans-serif;
+        background-color: var(--color-main-bg);
+
   }
 
-  .sidebar {
-    width: 250px;
-    height: 100vh;
-    position: sticky;
-    top: 0;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    transition: width 0.3s ease;
+
+    .sidebar {
+        width: 250px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      flex-shrink: 0;
+      background-color: #fcfcfc;
+      box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+      display: flex;
+      flex-direction: column;
+      padding: 1rem;
+      transition: width 0.3s ease, padding 0.3s ease;
+
   }
+
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0.5rem 1rem 0.5rem;
+      margin-bottom: 0.5rem;
+
+  }
+
+  .logo-text {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #000000;
+    display: flex;
+    align-items: center;
+    font-family: 'Segoe UI'
+  }
+
+  .logo-icon {
+    color: #46ba86;
+    margin-right: 0.8rem;
+    font-size: 1.5rem;
+  }
+
+  .toggle-btn {
+    background: none;
+    border: none;
+    color: #4B5563;
+    cursor: pointer;
+    padding: 0.5rem;
+    font-size: 1.2rem;
+    border-radius: 6px;
+    transition: background-color 0.2s;
+  }
+
+    .toggle-btn:hover {
+      background-color: #E5E7EB;
+    }
+
+    .nav-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+      flex-grow: 1;
+
+  }
+
+    .nav-item {
+      margin-bottom: 0.25rem;
+
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    color: #4B5563;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    transition: background-color 0.2s, color 0.2s;
+  }
+
+  .link-text {
+    white-space: nowrap;
+    overflow: hidden;
+    flex-grow: 1;
+    font-family: 'Segoe UI'
+  }
+
+  .nav-link:hover {
+    background-color: #f4f4f5;
+    color: #000000;
+  }
+
+
+    .nav-link.active {
+      background-color: #f4f4f5;
+      color: #46ba86;
+      font-weight: 600;
+      position: relative;
+
+  }
+
+      .nav-link.active::before {
+        content: '';
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 3px;
+        background-color: #ECFDF5;
+        border-radius: 6px 0 0 6px;
+      }
+
+    .nav-link i.me-2 {
+      margin-right: 0.75rem;
+      font-size: 1.1rem;
+
+      color: #9CA3AF; 
+      transition: color 0.2s;
+
+  }
+
+  .nav-link.active i.me-2 {
+    color: #46ba86;
+  }
+
+    .sidebar-footer {
+      padding-top: 1rem;
+      border-top: 1px solid #4B5563;
+      margin-top: auto;
+      position: relative;
+      padding-bottom: 0.5rem;
+
+  }
+
+
+  .user-profile-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    text-align: left;
+    padding: 0.6rem 0.75rem;
+    border-radius: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #4B5563;
+    transition: background-color 0.2s;
+  }
+
+    .user-profile-toggle:hover,
+    .user-profile-toggle.active {
+      background-color: #E5E7EB;
+    }
+
+    .user-profile-toggle .user-name {
+        margin-right: auto;
+        font-weight: 500;
+
+  }
+
+    .user-profile-toggle .user-icon {
+        font-size: 1.5rem;
+        margin-right: 0.75rem;
+        color: #9CA3AF; 
+
+  }
+
+    .user-profile-toggle .toggle-arrow {
+        font-size: 0.75rem;
+        transition: transform 0.2s ease;
+
+  }
+
+    .user-profile-toggle.active .toggle-arrow {
+        transform: rotate(180deg);
+
+  }
+
+    .user-dropdown-menu {
+      position: absolute;
+      bottom: calc(100% + 10px);
+      left: 10px;
+      right: 10px;
+      background-color: white;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      border-radius: 8px;
+      padding: 0.5rem 0;
+      z-index: 10;
+
+  }
+
+  .dropdown-item {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 0.6rem 1rem;
+    color: #4B5563;
+    text-decoration: none;
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.15s;
+    font-size: 0.95rem;
+  }
+
+    .dropdown-item:hover {
+      background-color: #E5E7EB;
+    }
+
+      .dropdown-item i.me-2 {
+          margin-right: 0.75rem;
+          font-size: 1.1rem;
+          color: #9CA3AF; 
+
+    }
+
+    .logout-item {
+      color: #DC2626;
+
+  }
+
+  .dropdown-divider {
+    height: 1px;
+    background-color: #E5E7EB;
+    margin: 0.5rem 0;
+  }
+
 
     .sidebar.closed {
-      width: 60px; 
-      padding-left: 0.5rem !important;
-      padding-right: 0.5rem !important;
+      width: 70px;
+      padding: 1rem 0.5rem;
+
+  }
+
+      .sidebar.closed .link-text,
+      .sidebar.closed .user-name,
+      .sidebar.closed .toggle-arrow {
+          display: none;
+
     }
 
-      .sidebar.closed .nav-link {
-        padding: 10px 5px; 
-        text-align: center;
-      }
+      .sidebar.closed .sidebar-header {
+          justify-content: center;
+          padding: 0;
+          margin-bottom: 1.5rem;
 
-        .sidebar.closed .nav-link i.me-2 {
+    }
+
+      .sidebar.closed .nav-link,
+      .sidebar.closed .user-profile-toggle {
+          justify-content: center;
+          padding: 0.6rem;
+
+    }
+
+      .sidebar.closed .nav-link i.me-2,
+      .sidebar.closed .user-profile-toggle .user-icon {
           margin-right: 0 !important;
-        }
 
-      .sidebar.closed h4 {
+  }
+
+    .sidebar.closed .logo-text {
         display: none;
-      }
 
-      .sidebar.closed .border-bottom {
-        justify-content: center !important;
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-      }
+  }
 
-      .sidebar.closed .btn-outline-danger {
-        padding-left: 0;
-        padding-right: 0;
-      }
+    .sidebar.closed .user-dropdown-menu {
+        left: 70px;
+        bottom: 10px;
+        width: 200px;
 
-    .sidebar .nav-link {
-      color: #343a40 !important;
-      padding: 10px 15px;
-      border-radius: 5px;
-      transition: background-color 0.2s;
-    }
+  }
 
-      .sidebar .nav-link:hover {
-        background-color: #F0F0F0;
-        color: #343a40 !important;
-      }
+    .main-content {
+      flex-grow: 1;
+      padding: 2rem;
+      overflow-y: auto;
 
-      .sidebar .nav-link.active {
-        background-color: #EDEDED;
-        font-weight: bold;
-        color: #495057 !important;
-      }
-
-    .sidebar h4 {
-      color: black !important;
-    }
+  }
 </style>
