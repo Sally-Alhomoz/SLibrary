@@ -11,6 +11,8 @@ namespace SLibrary.Business.Interfaces
         string ReleaseBook(string title, string clientName);
         List<Reservationdto> GetAllReservations();
         Reservationdto GetReservationById(int id);
+        int GetTotalReservationsByUser(string username);
+        int GetActiveReservationsByUser(string username);
         (List<Reservationdto> items, int totalCount) GetReservationsPaged(
                     int page = 1,
                     int pageSize = 10,

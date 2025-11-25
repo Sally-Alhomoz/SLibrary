@@ -125,5 +125,62 @@ namespace SLibraryAPI.Controllers
                 totalCount                
             });
         }
+
+        /// <summary>
+        /// Get reservation for the current user.
+        /// </summary>
+        [HttpGet("GetUserReservation")]
+        public IActionResult GetUserReservation()
+        {
+            string username = User.Identity!.Name!;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Unauthorized("User identity not found.");
+            }
+
+            try
+            {
+                int total = _reservationMng.GetTotalReservationsByUser(username);
+
+                return Ok(new
+                {
+                    totalReservations = total
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error while fetching reservation summary.");
+            }
+        }
+
+
+        /// <summary>
+        /// Get active reservation for the current user.
+        /// </summary>
+        [HttpGet("GetActiveReservation")]
+        public IActionResult GetActiveReservation()
+        {
+            string username = User.Identity!.Name!;
+
+            if (string.IsNullOrWhiteSpace(username))
+            {
+                return Unauthorized("User identity not found.");
+            }
+
+            try
+            {
+                int active = _reservationMng.GetActiveReservationsByUser(username);
+
+                return Ok(new
+                {
+                    activeReservations = active
+                });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error while fetching reservation summary.");
+            }
+        }
     }
 }

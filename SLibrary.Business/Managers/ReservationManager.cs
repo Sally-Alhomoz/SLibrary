@@ -201,5 +201,27 @@ namespace SLibrary.Business.Managers
 
             return (items, totalCount);
         }
+
+        public int GetTotalReservationsByUser(string username)
+        {
+            _logger.LogInformation("Calculating total reservations for user: {Username}.", username);
+
+            int totalCount = _uow.DBReservations.GetReservations()
+                .Count(r => r.ReservedBy == username);
+
+            _logger.LogInformation("User {Username} has a total of {Count} reservations.", username, totalCount);
+            return totalCount;
+        }
+
+        public int GetActiveReservationsByUser(string username)
+        {
+            _logger.LogInformation("Calculating active reservations for user: {Username}.", username);
+
+            int activeCount = _uow.DBReservations.GetReservations()
+                .Count(r => r.ReservedBy == username && r.ReleaseDate == null);
+
+            _logger.LogInformation("User {Username} has {Count} active reservations.", username, activeCount);
+            return activeCount;
+        }
     }
 }
