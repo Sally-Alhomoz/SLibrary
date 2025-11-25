@@ -98,7 +98,7 @@ namespace SLibraryAPI.Controllers
             [FromQuery] string sortBy = "title",
             [FromQuery] string sortDirection = "asc")
         {
-            var (users, totalCount) = _bookManager.GetUsersPaged(
+            var (users, totalCount) = _bookManager.GetBooksPaged(
                 page, pageSize, search, sortBy, sortDirection);
 
             return Ok(new

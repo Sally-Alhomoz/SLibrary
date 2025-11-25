@@ -95,7 +95,7 @@ namespace SLibrary.Business.Managers
 
         }
 
-        public (List<Bookdto> books, int totalCount) GetUsersPaged(
+        public (List<Bookdto> books, int totalCount) GetBooksPaged(
             int page =1,
             int pageSize=10,
             string search="",
