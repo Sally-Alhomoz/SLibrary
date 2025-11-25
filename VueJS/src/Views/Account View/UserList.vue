@@ -38,7 +38,7 @@
     <!-- Table -->
     <div v-else class="table-responsive">
       <table class="table table-striped table-bordered table-hover table-sm">
-        <thead class="text-center">
+        <thead class="text-center bg-dark text-white">
           <tr>
             <th @click="sortBy('username')" class="cursor-pointer user-select-none">
               Username <i :class="sortIcon('username')"></i>
@@ -262,13 +262,52 @@
 </script>
 
 <style scoped>
-  .cursor-pointer {
-    cursor: pointer;
+  .container {
+    font-family: 'Segoe UI';
+    background: #ffff;
   }
-  .table-dark th {
-    background-color: #212529 !important;
+
+  h2 {
+    font-size: 2.8rem;
+    font-weight: 750;
+    color: #46ba86;
+    text-align: center;
+    margin-bottom: 2rem;
   }
-  .input-group:focus-within {
-    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+
+  /* Search Bar */
+  .input-group {
+    max-width: 500px;
+    margin: 0 auto 1rem;
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(70, 186, 134, 0.15);
+    border: 1px solid rgba(70, 186, 134, 0.2);
+  }
+
+  .input-group-text {
+    background: transparent !important;
+    border: none;
+    padding: 0 1.2rem;
+  }
+
+  .form-control {
+    border: none !important;
+    padding: 1.1rem 1rem;
+    font-size: 1rem;
+    box-shadow: none !important;
+  }
+
+    .form-control:focus {
+      box-shadow: none !important;
+    }
+
+  .input-group button {
+    border: none;
+    background: transparent;
+    padding: 0 1.2rem;
+    color: #94a3b8;
   }
 </style>

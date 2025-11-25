@@ -79,7 +79,7 @@
                       type="button"
                       class="btn btn-link text-danger p-0 action-button"
                       title="Release Book"
-                      @click="confirm(res)">
+                      @click="confirmRelease(res)">
                 <i class="fas fa-arrow-alt-circle-up me-1"></i> Release
               </button>
             </td>
@@ -383,49 +383,52 @@
 </script>
 
 <style scoped>
-  .cursor-pointer {
-    cursor: pointer;
-    user-select: none;
+  .container {
+    font-family: 'Segoe UI', sans-serif;
+    background: #ffff;
   }
 
-    .cursor-pointer:hover {
-      background-color: rgba(255, 255, 255, 0.1);
-    }
-
-    .cursor-pointer i {
-      font-size: 0.8em;
-      margin-left: 5px;
-      color: rgba(255, 255, 255, 0.5);
-    }
-
-
-  .pagination-md .page-link {
-    padding: 0.5rem 0.9rem;
-    font-size: 0.95rem;
-    border-radius: 0.5rem;
-    cursor: pointer !important;
-    transition: all 0.2s ease;
-    min-width: 44px;
+  h2 {
+    font-size: 2.8rem;
+    font-weight: 750;
+    color: #46ba86;
     text-align: center;
+    margin-bottom: 2rem;
   }
 
-  .pagination-md .page-item .page-link:hover {
-    background-color: #0d6efd;
-    color: white !important;
-    border-color: #0d6efd;
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(13, 110, 253, 0.25);
+  /* Search Bar */
+  .input-group {
+    max-width: 500px;
+    margin: 0 auto 1rem;
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(70, 186, 134, 0.15);
+    border: 1px solid rgba(70, 186, 134, 0.2);
   }
 
-  .pagination-md .page-item.active .page-link {
-    background-color: #0d6efd !important;
-    border-color: #0d6efd !important;
-    color: white !important;
-    font-weight: 600;
+  .input-group-text {
+    background: transparent !important;
+    border: none;
+    padding: 0 1.2rem;
   }
 
-  .pagination-md .page-item.disabled .page-link {
-    cursor: not-allowed !important;
-    opacity: 0.5;
+  .form-control {
+    border: none !important;
+    padding: 1.1rem 1rem;
+    font-size: 1rem;
+    box-shadow: none !important;
+  }
+
+    .form-control:focus {
+      box-shadow: none !important;
+    }
+
+  .input-group button {
+    border: none;
+    background: transparent;
+    padding: 0 1.2rem;
+    color: #94a3b8;
   }
 </style>

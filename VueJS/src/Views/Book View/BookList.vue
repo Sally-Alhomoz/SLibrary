@@ -368,3 +368,74 @@
     loadBooks()
   })
 </script>
+
+<style scoped>
+  .container {
+    font-family: 'Segoe UI', sans-serif;
+    background: #ffff;
+  }
+
+  h2 {
+    font-size: 2.8rem;
+    font-weight: 750;
+    color: #46ba86;
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  /* Search Bar */
+  .input-group {
+    max-width: 500px;
+    margin: 0 auto 1rem;
+    display: flex;
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(70, 186, 134, 0.15);
+    border: 1px solid rgba(70, 186, 134, 0.2);
+  }
+
+  .input-group-text {
+    background: transparent !important;
+    border: none;
+    padding: 0 1.2rem;
+  }
+
+  .form-control {
+    border: none !important;
+    padding: 1.1rem 1rem;
+    font-size: 1rem;
+    box-shadow: none !important;
+  }
+
+    .form-control:focus {
+      box-shadow: none !important;
+    }
+
+  .input-group button {
+    border: none;
+    background: transparent;
+    padding: 0 1.2rem;
+    color: #94a3b8;
+  }
+
+  /* Add Book Button */
+  .btn-primary {
+    background: #46ba86 !important;
+    border: none !important;
+    padding: 0.9rem 2rem !important;
+    border-radius: 50px !important;
+    font-weight: 600;
+    box-shadow: 0 8px 25px rgba(70, 186, 134, 0.4);
+    transition: all 0.3s ease;
+  }
+
+    .btn-primary:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 35px rgba(70, 186, 134, 0.5);
+    }
+
+
+</style>
+
+
