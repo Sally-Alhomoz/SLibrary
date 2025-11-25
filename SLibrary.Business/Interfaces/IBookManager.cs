@@ -14,5 +14,6 @@ public interface IBookManager
     string search,
     string sortBy,
     string sortDirection);
+    int GetAvailableBookCount();
 
 }

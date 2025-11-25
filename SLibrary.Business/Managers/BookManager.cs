@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
-using Microsoft.Extensions.Logging;
 using SLibrary.DataAccess.SUnitOfWork;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace SLibrary.Business.Managers
 {
@@ -146,6 +147,13 @@ namespace SLibrary.Business.Managers
                 .ToList();
 
             return (items, totalCount);
+        }
+
+        public int GetAvailableBookCount()
+        {
+
+            int count =_uow.DBBooks.GetBooks().Count();
+            return count;
         }
 
     }

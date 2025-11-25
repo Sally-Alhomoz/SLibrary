@@ -108,5 +108,25 @@ namespace SLibraryAPI.Controllers
             });
         }
 
+        /// <summary>
+        /// Get Availabe book count.
+        /// </summary>
+        [HttpGet("AvailableCount")] 
+        [Authorize] 
+        public IActionResult GetAvailableCount()
+        {
+            _logger.LogInformation("GET called to fetch available book count.");
+            try
+            {
+                int count = _bookManager.GetAvailableBookCount();
+                _logger.LogInformation("Returned available book count: {Count}.", count);
+                return Ok(new { availableCount = count });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to fetch available book count.");
+                return StatusCode(500, "Internal server error while fetching count.");
+            }
+        }
     }
 }
