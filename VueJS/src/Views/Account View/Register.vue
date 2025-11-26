@@ -5,10 +5,11 @@
         <h1>SLibrary</h1>
         <p class="subtitle">Sign up to read books and more</p>
 
-        <form @submit.prevent="Login">
+        <form @submit.prevent="Register">
           <input v-model="username" type="text" placeholder="Username" required />
           <input v-model="email" type="text" placeholder="Email" required />
           <input v-model="password" type="password" placeholder="Password" required />
+          <input v-model="confirmPassword" type="password" placeholder="Confirm Password" required />
           <button type="submit">Sign Up</button>
         </form>
 
@@ -37,20 +38,39 @@
   import { ref } from 'vue'
   import { useRouter } from 'vue-router'
   import axios from 'axios'
+import { errorDialog } from '../../Component/Modals/ConfirmationModal'
 
   const router = useRouter()
   const username = ref('')
   const password = ref('')
+  const confirmPassword = ref('')
   const email = ref('')
   const error = ref('')
 
   const Register = async () => {
-    await axios.post('/api/Account/Register', {
-      Username: username.value,
-      Password: password.value,
-      Email: email.value
-    })
-    router.push('/')
+    if (password.value !== confirmPassword.value) {
+      await errorDialog('Passwords do not match')
+      return
+    }
+
+    try {
+      await axios.post('/api/Account/Register', {
+        Username: username.value,
+        Password: password.value,
+        Email: email.value
+      })
+      router.push('/')
+    } catch (error) {
+      let errorMessage = 'An unexpected error occurred.';
+
+      if (error.response && error.response.data) {
+        errorMessage = error.response.data;
+      } else if (error.response) {
+        errorMessage = `Error ${error.response.status}: Failed to register`;
+      }
+      await errorDialog(errorMessage)
+      return
+    }
   }
 </script>
 
