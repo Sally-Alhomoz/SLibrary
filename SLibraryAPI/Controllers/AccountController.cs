@@ -18,10 +18,10 @@ namespace SLibraryAPI.Controllers
     [ApiController]
     public class AccountController : ControllerBase
     {
-        private readonly IUserManager  _userManager;
+        private readonly IUserManager _userManager;
         private readonly IConfiguration configuration;
         private readonly ILogger<AccountController> _logger;
-        public AccountController(IUserManager userManager , IConfiguration config, ILogger<AccountController> logger)
+        public AccountController(IUserManager userManager, IConfiguration config, ILogger<AccountController> logger)
         {
             _userManager = userManager;
             configuration = config;
@@ -102,15 +102,15 @@ namespace SLibraryAPI.Controllers
         ///<summary>
         ///Get all users.
         ///</summary>
-        [Authorize]
-        [HttpGet]
-        public async Task<IActionResult> Read()
-        {
-            _logger.LogInformation("GET called to fetch all users");
-            var users = _userManager.GetAllUsers();
-            _logger.LogInformation("Returned {Count} users.", users.Count);
-            return Ok(users);
-        }
+        //[Authorize]
+        //[HttpGet]
+        //public async Task<IActionResult> Read()
+        //{
+        //    _logger.LogInformation("GET called to fetch all users");
+        //    var users = _userManager.GetAllUsers();
+        //    _logger.LogInformation("Returned {Count} users.", users.Count);
+        //    return Ok(users);
+        //}
 
         /// <summary>
         /// Delete User.
@@ -146,6 +146,7 @@ namespace SLibraryAPI.Controllers
         /// Sets a user's status to inactive (when client logout).
         /// </summary>
         [HttpPatch("SetInActive/{username}")]
+        [Authorize]
         public IActionResult SetInActive(string username)
         {
             _logger.LogInformation("PATCH called to set user {Username} to inactive.", username);
@@ -155,7 +156,7 @@ namespace SLibraryAPI.Controllers
             if (success)
             {
                 _logger.LogInformation("User {Username} successfully set to inactive.", username);
-                return NoContent(); 
+                return NoContent();
             }
             else
             {
@@ -192,7 +193,7 @@ namespace SLibraryAPI.Controllers
                 return BadRequest("Incorrect old password.");
             }
 
-            _userManager.ResetPassword(user.Username, dto.NewPassword,dto.OldPassword);
+            _userManager.ResetPassword(user.Username, dto.NewPassword, dto.OldPassword);
             _logger.LogInformation("Successfully reset password for user {Username}", username);
             return Ok();
         }
@@ -202,7 +203,7 @@ namespace SLibraryAPI.Controllers
         /// </summary>
         [HttpPatch("EditEmail")]
         [Authorize]
-        public IActionResult EditEmail([FromBody] EditAccountdto dto)
+        public IActionResult EditEmail([FromBody] EditEmaildto dto)
         {
 
             var username = User.Identity.Name;
@@ -242,7 +243,7 @@ namespace SLibraryAPI.Controllers
 
             var user = _userManager.GetAccountInfo(username);
 
-            if(user == null)
+            if (user == null)
             {
                 _logger.LogWarning("User Not Found");
                 return NotFound("User Not Found");
@@ -252,6 +253,69 @@ namespace SLibraryAPI.Controllers
             return Ok(user);
         }
 
+        [HttpPatch("togglestatus")]
+        [Authorize]
+        public async Task<IActionResult> ToggleUserStatus(string username)
+        {
+            var user = _userManager.GetByUsername(username);
+            if (user == null) return NotFound("User not found.");
+
+            var result = _userManager.toggleUserStatus(username);
+
+            if (result)
+                return Ok();
+            else
+                return BadRequest();
+        }
+
+        [HttpPost("logout")]
+        [Authorize]
+        public async Task<IActionResult> Logout()
+        {
+            var username = User.Identity?.Name;
+            if (string.IsNullOrEmpty(username))
+                return BadRequest();
+
+            var user = _userManager.GetByUsername(username);
+            if (user != null)
+            {
+                var success = _userManager.SetUserInActive(username);
+
+                if (success)
+                {
+                    _logger.LogInformation("User {Username} successfully set to inactive.", username);
+                    return NoContent();
+                }
+                else
+                {
+                    _logger.LogWarning("Failed to set user {Username} to inactive.", username);
+                    return StatusCode(500, "Failed to update user status.");
+                }
+            }
+
+            return Ok(new { message = "Logged out and deactivated" });
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult Read(
+            [FromQuery] int page = 1,
+            [FromQuery] int pageSize = 10,
+            [FromQuery] string search = "",
+            [FromQuery] string sortBy = "username",
+            [FromQuery] string sortDirection = "asc")
+        {
+            var (users, totalCount) = _userManager.GetUsersPaged(
+                page, pageSize, search, sortBy, sortDirection);
+
+            return Ok(new
+            {
+                items = users,
+                totalCount = totalCount
+            });
+        }
+
 
     }
+
 }
