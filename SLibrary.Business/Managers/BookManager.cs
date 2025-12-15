@@ -1,12 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Shared;
 using SLibrary.DataAccess.Interfacses;
 using SLibrary.DataAccess.Models;
-using Microsoft.Extensions.Logging;
 using SLibrary.DataAccess.SUnitOfWork;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 
 namespace SLibrary.Business.Managers
 {
@@ -74,7 +75,7 @@ namespace SLibrary.Business.Managers
                 return "Book not found";
             }
 
-            var hasReservation = _uow.DBReservations.GetReservations().Any(r => r.BookID == id && r.ReleaseDate ==null);
+            var hasReservation = _uow.DBReservations.GetReservations().Any(r => r.BookID == id && r.ReleaseDate == null);
 
             if (hasReservation)
             {
@@ -92,6 +93,67 @@ namespace SLibrary.Business.Managers
             _logger.LogWarning("Failed to delete book");
             return "Failed to delete book";
 
+        }
+
+        public (List<Bookdto> books, int totalCount) GetBooksPaged(
+            int page = 1,
+            int pageSize = 10,
+            string search = "",
+            string sortBy = "title",
+            string sortDirection = "asc")
+        {
+            var query = _uow.DBBooks.GetBooks().AsQueryable();
+
+            // Global search
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var s = search.Trim().ToLower();
+                query = query.Where(b =>
+                    b.Title.ToLower().Contains(s) ||
+                    b.Author.ToLower().Contains(s)
+                );
+            }
+
+            query = (sortBy?.ToLower(), sortDirection?.ToLower()) switch
+            {
+                ("title", "desc") => query.OrderByDescending(b => b.Title),
+                ("title", _) => query.OrderBy(b => b.Title),
+
+                ("author", "desc") => query.OrderByDescending(b => b.Author),
+                ("author", _) => query.OrderBy(b => b.Author),
+
+                ("reserved", "desc") => query.OrderByDescending(b => b.Reserved),
+                ("reserved", _) => query.OrderBy(b => b.Reserved),
+
+                ("available", "desc") => query.OrderByDescending(b => b.Available),
+                ("available", _) => query.OrderBy(b => b.Available),
+
+                _ => query.OrderBy(b => b.Title) // default sort
+            };
+
+            int totalCount = query.Count();
+
+            var items = query
+                .Skip((page - 1) * pageSize)
+                .Take(pageSize)
+                .Select(b => new Bookdto
+                {
+                    ID = b.ID,
+                    Title = b.Title,
+                    Author = b.Author,
+                    Reserved = b.Reserved,
+                    Available = b.Available
+                })
+                .ToList();
+
+            return (items, totalCount);
+        }
+
+        public int GetAvailableBookCount()
+        {
+
+            int count = _uow.DBBooks.GetBooks().Count();
+            return count;
         }
 
     }
