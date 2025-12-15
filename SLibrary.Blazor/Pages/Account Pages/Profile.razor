@@ -1,0 +1,338 @@
+﻿@page "/profile"
+@using SLibrary.Blazor.Components.Modals
+@using Services.Account_Services 
+@using Shared 
+@inject IAccountService AccountService
+@inject NavigationManager Nav
+
+<PageTitle>Profile Settings</PageTitle>
+
+<div class="container py-5 edit-profile-container">
+    <h2 class="text-center mb-5 fw-bold profile-title">Profile Settings</h2>
+
+    <div class="card profile-card shadow-lg border-0 rounded-xl">
+        <div class="card-body p-4 p-md-5">
+            <div class="row">
+                
+                <div class="col-lg-4 border-end pe-lg-4 mb-4 mb-lg-0">
+                    <div class="text-center mb-4">
+                        <div class="avatar-placeholder mb-3">
+                            <i class="bi bi-person-circle" style="font-size: 4rem;"></i>
+                        </div>
+                    </div>
+                    <br /><br /><br />
+                    <div class="mt-4 pt-3 border-top text-center">
+                        <button type="button"
+                                class="btn btn-outline-secondary me-2"
+                                @onclick="OpenPasswordModal">
+                            <i class="bi bi-lock me-2"></i> Change Password
+                        </button>
+                    </div>
+                </div>
+
+                <div class="col-lg-8 ps-lg-4">
+                    <h5 class="fw-semibold text-dark mb-4">Account Information</h5>
+                    
+
+                    @if (!string.IsNullOrEmpty(ErrorMessage))
+                    {
+                        <div class="alert alert-danger">@ErrorMessage</div>
+                    }
+                    else
+                    {
+                        <EditForm Model="User" OnValidSubmit="ConfirmUpdate">
+                            <div class="mb-4">
+                                <label for="username" class="form-label text-dark"><strong>Username</strong></label>
+                                <div class="input-group">
+                                    <InputText id="username" class="form-control" @bind-Value="User.Username" readonly />
+                                    <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="email" class="form-label text-dark"><strong>E-mail</strong></label>
+                                <div class="input-group">
+                                    <InputText id="email"
+                                               class="form-control"
+                                               @bind-Value="NewEmail"
+                                               readonly="@(!IsEmailEditing)"
+                                               autocomplete="email" />
+
+                                    <button class="btn btn-outline-secondary edit-toggle-btn"
+                                            type="button"
+                                            @onclick="ToggleEmailEdit"
+                                            title="@(IsEmailEditing ? "Cancel Editing" : "Edit Email")">
+                                        @if (IsEmailEditing)
+                                        {
+                                            <i class="bi bi-x-lg"></i>
+                                        }
+                                        else
+                                        {
+                                            <i class="bi bi-pencil"></i> 
+                                        }
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="d-flex justify-content-end mt-5">
+                                @if (IsEmailEditing)
+                                {
+                                    <button type="submit" class="btn btn-primary update-btn">Update</button>
+                                }
+                            </div>
+                        </EditForm>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<Modal @bind-IsVisible="ShowConfirmModal" 
+       Title="Save Changes?"
+       ConfirmText="Save"
+       ConfirmButtonClass="btn-primary"
+       OnConfirm="UpdateEmail"
+       OnCancel="() => ShowConfirmModal = false">
+    <p>Are you sure you want to change your email address to <strong>@NewEmail</strong>?</p>
+</Modal>
+
+<!-- Error Modal -->
+<Modal @bind-IsVisible="showErrorModal"
+       Title="@errorModalTitle"
+       Icon="bi-exclamation-triangle text-danger"
+       ShowFooter="false"
+       CloseOnBackdropClick="false"
+       OnConfirm="() => showErrorModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: #dc3545;"></i>
+        <p class="lead mt-3">@((MarkupString)errorModalMessage)</p>
+    </div>
+</Modal>
+
+<!-- Success Modal -->
+<Modal @bind-IsVisible="showSuccessModal"
+       Title="@successModalTitle"
+       Icon="bi-check2-circle text-success"
+       ShowFooter="false"
+       CloseOnBackdropClick="true"
+       OnConfirm="() => showSuccessModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-check2-circle" style="font-size: 4rem; color: #28a745;"></i>
+        <p class="lead mt-3">@((MarkupString)successModalMessage)</p>
+    </div>
+</Modal>
+
+<!--Change Password Modal-->
+<InputModal @bind-IsVisible="showPasswordModal"
+            Title="Change Password"
+            Icon="bi-lock-fill text-secondary"
+            ConfirmText="Change"
+            ConfirmButtonClass="btn-success"
+            FormFields="passwordFields"
+            OnConfirm="ConfirmChangePassword" />
+
+@code {
+    private Userdto User { get; set; } = new();
+    private string InitialEmail { get; set; } = "";
+    private string NewEmail { get; set; } = "";
+    private bool IsEmailEditing { get; set; } = false;
+    private string ErrorMessage { get; set; } = "";
+
+    private bool ShowConfirmModal { get; set; } = false;
+
+    private bool showErrorModal = false;
+    private string errorModalTitle = "Error";
+    private string errorModalMessage = "";
+
+    private bool showSuccessModal = false;
+    private string successModalTitle = "Success";
+    private string successModalMessage = "";
+
+    private bool showPasswordModal = false;
+    private List<InputModal.FormField> passwordFields = new();
+
+    private string oldPassword ="";
+    private string newPassword = "";
+    private string confirmPassword = "";
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        await GetUserInfo();
+    }
+
+
+    private async Task GetUserInfo()
+    {
+
+        ErrorMessage = string.Empty;
+        try
+        {
+            User = await AccountService.GetAccountInfo();
+            InitialEmail = User.Email;
+            NewEmail = User.Email;
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = $"Failed to load account information: {ex.Message}";
+        }
+
+    }
+
+
+    private void ToggleEmailEdit()
+    {
+        IsEmailEditing = !IsEmailEditing;
+        if (IsEmailEditing)
+        {
+            NewEmail = InitialEmail;
+        }
+        else
+        {
+            NewEmail = InitialEmail;
+        }
+    }
+
+
+    private void ConfirmUpdate()
+    {
+        if (string.Equals(NewEmail, InitialEmail, StringComparison.OrdinalIgnoreCase))
+        {
+            errorModalMessage = "Please change your email address before saving.";
+            showErrorModal = true;
+            return;
+        }
+
+        ShowConfirmModal = true;
+    }
+
+    private async Task UpdateEmail()
+    {
+        ShowConfirmModal = false;
+
+        try
+        {
+            await AccountService.EditEmail(NewEmail);
+
+            InitialEmail = NewEmail;
+            User.Email = NewEmail;
+            IsEmailEditing = false;
+            await GetUserInfo();
+
+            successModalMessage = "Your email address has been successfully changed.";
+            showSuccessModal = true;
+
+            StateHasChanged();
+
+            await Task.Delay(1500);
+
+            showSuccessModal = false;
+            StateHasChanged();
+
+        }
+        catch (Exception ex)
+        {
+            errorModalMessage = $"There was an issue updating your profile: {ex.Message}";
+            showErrorModal = true;
+        }
+
+    }
+
+    private void OpenPasswordModal()
+    {
+        oldPassword = "";
+        newPassword = "";
+        confirmPassword = "";
+
+        passwordFields = new()
+        {
+             new InputModal.FormField
+             {
+                 Label = "Old Password",
+                 Value = oldPassword,
+                 Placeholder="Enter your old password",
+                 Type="password",
+                 Required = true,
+                 FullWidth = true
+             },
+             new InputModal.FormField
+             {
+                 Label = "New Password",
+                 Value = newPassword,
+                 Placeholder="Enter your new password",
+                 Type="password",
+                 Required = true,
+                 FullWidth = true
+             },
+             new InputModal.FormField
+             {
+                 Label = "Confrim Password",
+                 Value = confirmPassword,
+                 Placeholder="Confrim your new password",
+                 Required = true,
+                 Type="password",
+                 FullWidth = true
+             }
+        };
+
+        showPasswordModal = true;
+    }
+
+    private async Task ConfirmChangePassword()
+    {
+        oldPassword = passwordFields[0].Value;
+        newPassword = passwordFields[1].Value;
+        confirmPassword = passwordFields[2].Value;
+
+        if (!string.Equals(newPassword, confirmPassword))
+        {
+            showPasswordModal = false;
+            errorModalMessage = "The New Password and Confirm Password fields must match.";
+            errorModalTitle = "Password Mismatch";
+            showErrorModal = true;
+
+            return;
+        }
+
+        if (string.IsNullOrWhiteSpace(newPassword) || string.IsNullOrWhiteSpace(oldPassword) || string.IsNullOrWhiteSpace(confirmPassword))
+        {
+            showPasswordModal = false;
+            errorModalMessage = "Password field cannot be empty.";
+            errorModalTitle = "Invalid Password";
+            showErrorModal = true;
+            return;
+        }
+
+        var dto = new ResetPassworddto
+            {
+                OldPassword = oldPassword,
+                NewPassword = newPassword,
+                ConfirmPassword = confirmPassword
+            };
+
+        try
+        {
+            await AccountService.ChangePassword(dto);
+
+            showPasswordModal = false;
+            successModalMessage = $"Password Changed Successfully, You will be logged out";
+
+            showSuccessModal = true;
+            StateHasChanged();
+
+            await Task.Delay(1500);
+
+            showSuccessModal = false;
+            StateHasChanged();
+
+            await AccountService.Logout();
+            Nav.NavigateTo("/login");
+        }
+        catch(Exception ex)
+        {
+            errorModalMessage = ex.Message;
+            showErrorModal = true;
+        }
+    }
+}
