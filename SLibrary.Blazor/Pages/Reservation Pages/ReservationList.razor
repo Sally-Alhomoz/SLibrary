@@ -1,0 +1,345 @@
+﻿@page "/reservationlist"
+@using Shared
+@using SLibrary.Blazor.Components.Modals
+@using Services.Reservation_Services
+@inject IReservationService reservationService
+@inject NavigationManager Nav
+
+<PageTitle>Reservation List</PageTitle>
+<h2 class="text-lg-center">Reservation List</h2>
+
+<br />
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+        <input type="text" class="form-control" style="width:300px;display:inline-block"
+               @bind="searchTerm" @bind:event="oninput" @onkeyup="OnSearchKeyUp"
+               placeholder="Search..." />
+    </div>
+</div>
+
+<br />
+
+@if (isLoading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        @errorMessage
+        <button class="btn btn-link p-0 ms-2" @onclick="RedirectToLogin">Login again</button>
+    </div>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>Reserved By</th>
+                    <th>Client Name</th>
+                    <th>Book Title</th>
+                    <th>Reserve Date</th>
+                    <th>Release Date</th>
+                    <th>Reservation Period</th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach (var res in reservations)
+                {
+                    <tr>
+                        <td>@res.ReservedBy</td>
+                        <td>
+                            <button class="btn btn-sm btn-link text-primary p-0 ms-1"
+                                    title="View Client Info"
+                                    @onclick="() => OpenClientInfoModal(res)">
+                                <i class="bi bi-eye-fill"></i>
+                            </button>
+                            @res.ClientName
+                        </td>
+                        <td>@res.BookTitle</td>
+                        <td>@res.ReservedDate</td>
+                        <td>
+                            @if(res.ReleaseDate.HasValue)
+                            {
+                                @res.ReleaseDate
+                            }
+                            else
+                            {
+                                <button type="button" class="btn btn-link text-danger p-0 action-button" 
+                                        title="Release Book"
+                                        @onclick="() => OpenConfirmModal(res)">
+                                    <i class="bi bi-arrow-up-circle-fill"></i> Release
+                                </button>
+                            }
+                        </td>
+                        <td>
+                            @if (res.ReleaseDate.HasValue)
+                            {
+                                string days = @res.ReservationPeriod.Days > 0 ? $"{@res.ReservationPeriod.Days} dy" : "";
+                                string hours = @res.ReservationPeriod.Hours > 0 ? $"{@res.ReservationPeriod.Hours} hr" : "";
+                                string minutes = @res.ReservationPeriod.Minutes > 0 ? $"{@res.ReservationPeriod.Minutes} min" : "";
+
+                                string Period = string.Join(", ", new[] { days, hours, minutes }.Where(s => !string.IsNullOrEmpty(s)));
+
+                                if (string.IsNullOrEmpty(Period))
+                                {
+                                    Period = $"{@res.ReservationPeriod.Seconds} sec";
+                                }
+                                <span class="text-dark">@Period</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success">Ongoing</span>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => LoadPage(currentPage - 1)">Previous</button>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                var pageNum = i;
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <button class="page-link" @onclick="() => LoadPage(pageNum)">@i</button>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="() => LoadPage(currentPage + 1)">Next</button>
+            </li>
+        </ul>
+        <div class="text-center text-muted small">
+            Showing @((currentPage - 1) * pageSize + 1)–@Math.Min(currentPage * pageSize, totalCount) of @totalCount reservations
+        </div>
+    </nav>
+}
+<!--Confirm Modal-->
+<Modal @bind-IsVisible="showConfirmModal"
+       Title="Release Book"
+       Icon="bi-trash text-danger"
+       ConfirmText="Release"
+       ConfirmButtonClass="btn-danger"
+       OnConfirm="() => ReleaseConfirmed()">
+    <p>Are you sure you want to release <strong>@Selectedres.BookTitle</strong> book?</p>
+</Modal>
+
+<!-- Error Modal -->
+<Modal @bind-IsVisible="showErrorModal"
+       Title="@errorModalTitle"
+       Icon="bi-exclamation-triangle text-danger"
+       ConfirmText="Close"
+       ConfirmButtonClass="btn-danger"
+       ShowFooter="true"
+       CloseOnBackdropClick="false"
+       OnConfirm="() => showErrorModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: #dc3545;"></i>
+        <p class="lead mt-3">@((MarkupString)errorModalMessage)</p>
+    </div>
+</Modal>
+
+<!-- Success Modal -->
+<Modal @bind-IsVisible="showSuccessModal"
+       Title="@successModalTitle"
+       Icon="bi-check2-circle text-success"
+       ConfirmText="Great!"
+       ConfirmButtonClass="btn-success"
+       ShowFooter="false"
+       CloseOnBackdropClick="true"
+       OnConfirm="() => showSuccessModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-check2-circle" style="font-size: 4rem; color: #28a745;"></i>
+        <p class="lead mt-3">@((MarkupString)successModalMessage)</p>
+    </div>
+</Modal>
+
+<!--Client Info Modal-->
+<Modal @bind-IsVisible="showClientInfoModal"
+       Title="Client Information"
+       Icon="bi-person-lines-fill text-primary"
+       
+       ShowFooter="true"
+       ConfirmText="Close"
+       ConfirmButtonClass="btn-secondary"
+       ShowCancelButton="false"
+       OnConfirm="() => showClientInfoModal = false"
+       OnCancel="() => showClientInfoModal = false"> 
+
+    @if (Selectedres != null)
+    {
+        <div class="p-3">
+            <h5 class="text-primary">Reservation for: <strong>@Selectedres.BookTitle</strong></h5>
+            <hr />
+            
+            <dl class="row">
+                <dt class="col-sm-4">Client Name:</dt>
+                <dd class="col-sm-8">@client.fullName</dd>
+
+                <dt class="col-sm-4">Phone Number:</dt>
+                <dd class="col-sm-8">@client.PhoneNo</dd>
+
+                <dt class="col-sm-4">Address:</dt>
+                <dd class="col-sm-8">@client.Address</dd>
+            </dl>
+        </div>
+    }
+    else
+    {
+        <p class="text-danger">No client information available.</p>
+    }
+</Modal>
+
+@code {
+    private List<Reservationdto> reservations = new();
+    private int totalCount = 0;
+    private int totalPages => (int)Math.Ceiling(totalCount / (double)pageSize);
+    private int currentPage = 1;
+    private const int pageSize = 10;
+    private string searchTerm = "";
+    private bool isLoading = true;
+    private string? errorMessage;
+
+    private bool showConfirmModal = false;
+    private Reservationdto Selectedres = null;
+
+    private bool showErrorModal = false;
+    private string errorModalTitle = "Error";
+    private string errorModalMessage = "";
+
+    private bool showSuccessModal = false;
+    private string successModalTitle = "Success";
+    private string successModalMessage = "";
+
+
+    private Clientdto? client = null;
+    private bool showClientInfoModal = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPage(1);
+    }
+
+    private async Task LoadPage(int page)
+    {
+        isLoading = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var (items, count) = await reservationService.Read(
+                page: page,
+                pageSize: pageSize,
+                search: searchTerm.Trim(),
+                sortBy: "clientname",
+                sortDirection: "asc");
+
+            reservations = items;
+            totalCount = count;
+            currentPage = page;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            errorMessage = "Session expired. Redirecting to login...";
+            RedirectToLogin();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to load reservations: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task OnSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await LoadPage(1);
+    }
+
+
+    private void OpenConfirmModal(Reservationdto res)
+    {
+        Selectedres = res;
+        showConfirmModal=true;
+    }
+
+    private async Task ReleaseConfirmed()
+    {
+        if (Selectedres == null) return;
+
+        try
+        {
+            await reservationService.Release(Selectedres.ClientName, Selectedres.BookTitle);
+            await LoadPage(currentPage);
+
+            showConfirmModal = false;
+
+            successModalTitle = "Released!";
+            successModalMessage = $"Book <strong>{Selectedres.BookTitle}</strong> released successfully";
+            showSuccessModal = true;
+            StateHasChanged();
+
+            await Task.Delay(1500);
+
+            showSuccessModal = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorModalTitle = "Release Failed";
+            errorModalMessage = $"Book could not be released.<br><br><small>{ex.Message}</small>";
+            showErrorModal = true;
+        }
+
+        Selectedres = null;
+    }
+
+
+    private async Task OpenClientInfoModal(Reservationdto res)
+    {
+        Selectedres = res;
+        client= null; 
+        showClientInfoModal = true;
+
+
+        try
+        {
+            client= await reservationService.GetClientInfo(res.ClientName);
+
+        }
+        catch (Exception ex)
+        {
+            client= new Clientdto
+            {
+                fullName = res.ClientName,
+                Address = "ERROR: Failed to load details. " + ex.Message
+            };
+        }
+    }
+
+
+
+
+    private void RedirectToLogin()
+    {
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+}
