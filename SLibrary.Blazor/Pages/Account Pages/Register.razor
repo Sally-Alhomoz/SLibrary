@@ -1,0 +1,117 @@
+﻿@page "/register"
+@using Shared
+@using SLibrary.Blazor.Components.Modals
+@using SLibrary.Blazor.Services.Authentication_Services
+@using SLibrary.Blazor.Services.Account_Services
+@inject IAccountService AccountService
+@inject CustomAuthStateProvider AuthStateProvider
+@inject NavigationManager Nav
+@layout PublicLayout
+
+<PageTitle>Register</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white text-center">
+                <h4>Register</h4>
+            </div>
+            <div class="card-body p-4">
+
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ErrorMessage</div>
+                }
+
+                <EditForm Model="newUser" OnValidSubmit="HandleSignUp">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <InputText @bind-Value="newUser.Username" class="form-control" placeholder="Enter username" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">E-mail</label>
+                        <InputText @bind-Value="newUser.Email" class="form-control" placeholder="Enter email" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <InputText @bind-Value="newUser.Password" type="password" class="form-control" placeholder="Enter password" />
+                    </div>
+
+
+                    <div class="mb-3">
+                        <label class="form-label">Confirm Password</label>
+                        <InputText @bind-Value="confrimpassword" type="password" class="form-control" placeholder="Confrim your password" />
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <span>Sign Up</span>
+                        </button>
+                    </div>
+                </EditForm>
+            </div>
+
+            <div class="card-footer text-center bg-light">
+                <small class="text-muted">
+                    already have an account? <a href="/login">Login here</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<Modal @bind-IsVisible="showErrorModal"
+       Title="@errorModalTitle"
+       Icon="bi-exclamation-triangle text-danger"
+       ShowFooter="false"
+       CloseOnBackdropClick="false"
+       OnConfirm="() => showErrorModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: #dc3545;"></i>
+        <p class="lead mt-3">@((MarkupString)errorModalMessage)</p>
+    </div>
+</Modal>
+
+@code {
+    private dtoNewUser newUser = new();
+    private string confrimpassword = "";
+
+    private string? ErrorMessage;
+    private bool loading = false;
+
+    private bool showErrorModal = false;
+    private string errorModalTitle = "Error";
+    private string errorModalMessage = "";
+
+    private async Task HandleSignUp()
+    {
+        ErrorMessage = null;
+
+        if (!string.Equals(newUser.Password, confrimpassword))
+        {
+            errorModalMessage = "The Password and Confirm Password fields must match.";
+            errorModalTitle = "Password Mismatch";
+            showErrorModal = true;
+
+            return;
+        }
+
+        try
+        {
+            await AccountService.Register(newUser);
+
+            Nav.NavigateTo("/login", forceLoad: true);
+        }
+        catch (Exception ex)
+        {
+            errorModalMessage = "Sign Up failed: " + ex.Message;
+            showErrorModal = true;
+        }
+    }
+}
