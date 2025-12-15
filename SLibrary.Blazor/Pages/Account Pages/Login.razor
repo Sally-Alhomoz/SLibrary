@@ -1,0 +1,84 @@
+﻿@page "/login"
+@using Shared
+@using SLibrary.Blazor.Services.Authentication_Services
+@using SLibrary.Blazor.Services.Account_Services
+@inject IAccountService AccountService
+@inject CustomAuthStateProvider AuthStateProvider
+@inject NavigationManager Nav
+@layout PublicLayout
+
+
+<PageTitle>Login</PageTitle>
+
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-4">
+        <div class="card shadow-lg">
+            <div class="card-header bg-success text-white text-center">
+                <h4>SLibrary Login</h4>
+            </div>
+            <div class="card-body p-4">
+
+                @if (!string.IsNullOrEmpty(ErrorMessage))
+                {
+                    <div class="alert alert-danger">@ErrorMessage</div>
+                }
+
+                <EditForm Model="loginModel" OnValidSubmit="HandleLogin">
+                    <DataAnnotationsValidator />
+
+                    <div class="mb-3">
+                        <label class="form-label">Username</label>
+                        <InputText @bind-Value="loginModel.Username" class="form-control" placeholder="Enter username" />
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Password</label>
+                        <InputText @bind-Value="loginModel.password" type="password" class="form-control" placeholder="Enter password" />
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-success btn-lg">
+                            <span>Login</span>
+                        </button>
+
+                    </div>
+                </EditForm>
+            </div>
+
+            <div class="card-footer text-center bg-light">
+                <small class="text-muted">
+                    Need an account? <a href="/register">Register here</a>
+                </small>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    private dtoLogin loginModel = new();
+
+    private string? ErrorMessage;
+
+    private async Task HandleLogin()
+    {
+        ErrorMessage = null;
+
+        try
+        {
+            var success = await AccountService.Login(loginModel.Username, loginModel.password);
+
+            if(success)
+            {
+                Nav.NavigateTo("/", forceLoad: true);
+            }
+            else
+            {
+                ErrorMessage = "Invalid username or password";
+            }
+        }
+        catch (Exception ex)
+        {
+            ErrorMessage = "Login failed: " + ex.Message;
+        }
+    }
+}
