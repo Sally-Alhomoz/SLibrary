@@ -1,0 +1,265 @@
+﻿@page "/userlist"
+@using Shared 
+@using SLibrary.Blazor.Components.Modals
+@using SLibrary.Blazor.Services.Account_Services
+@using SLibrary.Blazor.Services.Authentication_Services
+@inject CustomAuthStateProvider AuthProvider
+@inject IAccountService AccountService
+@inject NavigationManager Nav
+
+<PageTitle>User List</PageTitle>
+
+<h2 class="text-lg-center">UserList</h2>
+<br />
+
+<div class="mb-3 d-flex justify-content-between align-items-center">
+    <div>
+        <input type="text" class="form-control" style="width:300px;display:inline-block"
+               @bind="searchTerm" @bind:event="oninput" @onkeyup="OnSearchKeyUp"
+               placeholder="Search..." />
+    </div>
+</div>
+
+<br />
+
+@if (isLoading)
+{
+    <div class="text-center py-5">
+        <div class="spinner-border text-primary" role="status"></div>
+    </div>
+}
+else if (errorMessage != null)
+{
+    <div class="alert alert-danger">
+        @errorMessage
+        <button class="btn btn-link p-0 ms-2" @onclick="RedirectToLogin">Login again</button>
+    </div>
+}
+else if (!users.Any())
+{
+    <p class="text-center text-muted mt-5">No users found.</p>
+}
+else
+{
+    <div class="table-responsive">
+        <table class="table table-striped table-hover align-middle">
+            <thead class="table-light text-center">
+                <tr>
+                    <th>Username</th>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody class="text-center">
+                @foreach (var user in users)
+                {
+                    <tr>
+                        <td>@user.Username</td>
+                        <td>@user.Email</td>
+                        <td>@user.Role</td>
+                        <td>
+                            @if(user.IsActive)
+                            {
+                                <span class="badge bg-success">Active</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-secondary">Inactive</span>
+                            }
+                        </td>
+                        <td>
+                            @if (currentusername != user.Username)
+                            {
+                                <button class="btn btn-sm btn-link text-danger p-0"
+                                        title="Delete User"
+                                        @onclick="() => OpenDeleteModal(user.Username)">
+
+                                    <i class="bi bi-trash-fill"></i>
+                                </button>
+                            }
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    <nav class="mt-4">
+        <ul class="pagination justify-content-center">
+            <li class="page-item @(currentPage == 1 ? "disabled" : "")">
+                <button class="page-link" @onclick="() => LoadPage(currentPage - 1)">Previous</button>
+            </li>
+
+            @for (int i = 1; i <= totalPages; i++)
+            {
+                var pageNum = i;
+                <li class="page-item @(i == currentPage ? "active" : "")">
+                    <button class="page-link" @onclick="() => LoadPage(pageNum)">@i</button>
+                </li>
+            }
+
+            <li class="page-item @(currentPage == totalPages ? "disabled" : "")">
+                <button class="page-link" @onclick="() => LoadPage(currentPage + 1)">Next</button>
+            </li>
+        </ul>
+        <div class="text-center text-muted small">
+            Showing @((currentPage - 1) * pageSize + 1)–@Math.Min(currentPage * pageSize, totalCount) of @totalCount users
+        </div>
+    </nav>
+}
+
+<!-- Delete Modal -->
+<Modal @bind-IsVisible="showDeleteModal"
+       Title="Delete Book"
+       Icon="bi-trash text-danger"
+       ConfirmText="Delete"
+       ShowCancelButton="true"
+       ConfirmButtonClass="btn-danger"
+       OnConfirm="() => DeleteConfirmed()">
+    <p>Are you sure you want to delete <strong>@name</strong> user?</p>
+</Modal>
+
+<!-- Error Modal -->
+<Modal @bind-IsVisible="showErrorModal"
+       Title="@errorModalTitle"
+       Icon="bi-exclamation-triangle text-danger"
+       ConfirmText="Close"
+       ConfirmButtonClass="btn-danger"
+       ShowFooter="true"
+       CloseOnBackdropClick="false"
+       OnConfirm="() => showErrorModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-exclamation-triangle" style="font-size: 4rem; color: #dc3545;"></i>
+        <p class="lead mt-3">@((MarkupString)errorModalMessage)</p>
+    </div>
+</Modal>
+
+<!-- Success Modal -->
+<Modal @bind-IsVisible="showSuccessModal"
+       Title="@successModalTitle"
+       Icon="bi-check2-circle text-success"
+       ConfirmText="Great!"
+       ConfirmButtonClass="btn-success"
+       ShowFooter="false"
+       CloseOnBackdropClick="true"
+       OnConfirm="() => showSuccessModal = false">
+    <div class="text-center py-4">
+        <i class="bi bi-check2-circle" style="font-size: 4rem; color: #28a745;"></i>
+        <p class="lead mt-3">@((MarkupString)successModalMessage)</p>
+    </div>
+</Modal>
+
+@code {
+    private List<Userdto> users = new();
+    private int totalCount = 0;
+    private int totalPages => (int)Math.Ceiling(totalCount / (double)pageSize);
+    private int currentPage = 1;
+    private const int pageSize = 10;
+    private string searchTerm = "";
+    private bool isLoading = true;
+    private string? errorMessage;
+    private string currentusername = "";
+
+    private bool showDeleteModal = false;
+    private string name = "";
+
+    private bool showErrorModal = false;
+    private string errorModalTitle = "Error";
+    private string errorModalMessage = "";
+
+    private bool showSuccessModal = false;
+    private string successModalTitle = "Success";
+    private string successModalMessage = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        currentusername = await AuthProvider.GetUserNameAsync();
+        await LoadPage(1);
+    }
+
+    private async Task LoadPage(int page)
+    {
+        isLoading = true;
+        errorMessage = null;
+        StateHasChanged();
+
+        try
+        {
+            var (items, count) = await AccountService.Read(
+                page: page,
+                pageSize: pageSize,
+                search: searchTerm.Trim(),
+                sortBy: "title",
+                sortDirection: "asc");
+
+            users = items;
+            totalCount = count;
+            currentPage = page;
+        }
+        catch (HttpRequestException ex) when (ex.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+        {
+            errorMessage = "Session expired. Redirecting to login...";
+            RedirectToLogin();
+        }
+        catch (Exception ex)
+        {
+            errorMessage = "Failed to load users: " + ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private void OpenDeleteModal(string username)
+    {
+        name = username;
+        showDeleteModal = true;
+    }
+
+    private async Task DeleteConfirmed()
+    {
+        if (name == null) return;
+
+        try
+        {
+            await AccountService.Delete(name);
+            await LoadPage(currentPage);
+            showDeleteModal = false;
+
+            successModalTitle = "Deleted!";
+            successModalMessage = $"User <strong>{name}</strong> deleted successfully";
+            showSuccessModal = true;
+            StateHasChanged();
+
+            await Task.Delay(1500);
+
+            showSuccessModal = false;
+            StateHasChanged();
+        }
+        catch (Exception ex)
+        {
+            errorModalTitle = "Delete Failed";
+            errorModalMessage = $"User could not be deleted.<br><br><small>{ex.Message}</small>";
+            showErrorModal = true;
+        }
+        name = "";
+    }
+
+
+    private async Task OnSearchKeyUp(KeyboardEventArgs e)
+    {
+        if (e.Key == "Enter")
+            await LoadPage(1);
+    }
+
+    private void RedirectToLogin()
+    {
+        Nav.NavigateTo("/login", forceLoad: true);
+    }
+}
