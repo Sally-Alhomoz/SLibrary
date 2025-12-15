@@ -76,6 +76,7 @@ builder.Services.AddSwaggerGen(c =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.MapInboundClaims = false;
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateIssuer = false,
@@ -83,9 +84,39 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("##sally##Slibrary##sally##Slibrary"))
+                Encoding.UTF8.GetBytes("##sally##Slibrary##sally##Slibrary")),
+
+            NameClaimType = "name",   
+            RoleClaimType = "role"
         };
     });
+
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowBlazorWasm", policy =>
+    {
+        policy.WithOrigins(
+                "https://localhost:7208",   
+                "http://localhost:5208")   
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();     
+    });
+});
+
+//builder.Services.AddCors(options =>
+//{
+//    options.AddPolicy("AllowVueDev",
+//        policy =>
+//        {
+//            policy.WithOrigins("http://localhost:5173") 
+//                  .AllowAnyHeader()
+//                  .AllowAnyMethod()
+//                  .AllowCredentials();
+//        });
+//});
+
 
 var app = builder.Build();
 
@@ -97,10 +128,15 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("AllowBlazorWasm");
+//app.UseCors("AllowVueDev");
 
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
 
 
 app.Run();
