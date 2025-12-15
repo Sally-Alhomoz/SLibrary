@@ -43,6 +43,6 @@
     <PackageReference Include="System.Threading.Tasks.Extensions" Version="4.6.3" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
+    <ProjectReference Include="..\SharedModels\Shared.csproj" />
   </ItemGroup>
 </Project>
