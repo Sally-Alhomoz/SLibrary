@@ -1,0 +1,107 @@
+﻿@if (IsVisible)
+{
+    <div class="modal-backdrop fade show" 
+         @onclick="OnBackdropClick"
+         style="pointer-events: @(IsBusy ? "none" : "auto")"></div>
+
+    <div class="modal fade show d-block" tabindex="-1" style="display:block;">
+        <div class="modal-dialog @SizeClass modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        @if (!string.IsNullOrEmpty(Icon))
+                        {
+                            <i class="bi @Icon me-2"></i>
+                        }
+                        @Title
+                    </h5>
+                    <button type="button" 
+                            class="btn-close" 
+                            @onclick="Close"
+                            disabled="@IsBusy"></button>
+                </div>
+
+                <div class="modal-body">
+                    @ChildContent
+                </div>
+
+                @if (ShowFooter)
+                {
+                    <div class="modal-footer">
+
+                        @if (ShowCancelButton)
+                        {
+                            <button type="button"  
+                                 class="btn btn-secondary"  
+                                 @onclick="Cancel"
+                                 disabled="@IsBusy">
+                                @CancelText
+                            </button>
+                        }
+
+                        <button type="button"
+                                class="btn @ConfirmButtonClass"
+                                @onclick="Confirm"          
+                                disabled="@IsBusy">
+                            @if (IsBusy)
+                            {
+                                <span class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                                <span>Processing...</span>
+                            }
+                            else
+                            {
+                                @ConfirmText
+                            }
+                        </button>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    [Parameter] public bool IsVisible { get; set; }
+    [Parameter] public EventCallback<bool> IsVisibleChanged { get; set; }
+    [Parameter] public bool IsBusy { get; set; } = false;
+    [Parameter] public bool ShowCancelButton { get; set; } = true;
+
+    [Parameter] public EventCallback OnConfirm { get; set; }
+    [Parameter] public EventCallback OnCancel { get; set; }
+
+    [Parameter] public string Title { get; set; } = "Confirm";
+    [Parameter] public string Icon { get; set; } = "bi-exclamation-triangle text-warning";
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool ShowFooter { get; set; } = true;
+    [Parameter] public string ConfirmText { get; set; } = "Confirm";
+    [Parameter] public string CancelText { get; set; } = "Cancel";
+    [Parameter] public string ConfirmButtonClass { get; set; } = "btn-primary";
+    [Parameter] public string SizeClass { get; set; } = "";
+    [Parameter] public bool CloseOnBackdropClick { get; set; } = true;
+
+    private async Task Confirm()
+    {
+        await OnConfirm.InvokeAsync();           
+        IsVisible = false;                       
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+
+    private async Task Cancel()
+    {
+        await OnCancel.InvokeAsync();            
+        IsVisible = false;
+        await IsVisibleChanged.InvokeAsync(false);
+    }
+
+    private async Task Close()
+    {
+        if (IsBusy) return;                      
+        await Cancel();
+    }
+
+    private async Task OnBackdropClick()
+    {
+        if (CloseOnBackdropClick && !IsBusy)
+            await Close();
+    }
+}
